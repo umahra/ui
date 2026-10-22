@@ -1,45 +1,50 @@
-# @umahra/ui
+# Umahra UI
 
-A component-free foundation for the public Umahra UI library. The initial ESM entrypoint
-exports no runtime APIs. It includes TypeScript declarations and has no runtime or peer
-dependencies. Components and their peer contracts will be introduced separately.
+Umahra UI is a public UI library for building websites, using the theme conventions
+of [shadcn/ui](https://ui.shadcn.com). You can use shadcn components alongside Umahra
+UI and customize them with the same project-owned theme CSS.
+
+The library currently provides a component-free foundation with TypeScript
+declarations. Components will be added separately.
+
+## Why?
+
+shadcn/ui gives you component source that you can own and customize. When the same
+components are used across several projects, keeping shared improvements in sync
+means maintaining those changes in each codebase.
+
+We created Umahra UI to maintain the components and patterns we reuse in one
+library, so projects can receive fixes and improvements through explicit package
+upgrades. Projects still own their themes, fonts, and appearance overrides, and
+can add or customize shadcn components locally.
+
+## Prerequisites
+
+Your project should already have:
+
+- [Tailwind CSS v4](https://tailwindcss.com/docs/installation) configured for your framework.
+- `shadcn` installed so the `shadcn/tailwind.css` import resolves. See the
+  [official shadcn setup guide](https://ui.shadcn.com/docs/installation).
+- `tw-animate-css` installed for the animation styles imported by the stylesheet.
+
+These are build-time dependencies of your project. Your project also owns its
+global stylesheet and font loading.
 
 ## Installation
 
-Public npm installation is available only after a separately approved release.
-Once a version has been published, install and upgrade explicitly:
+`@umahra/ui` has not been published yet. After the first release, install it with:
 
 ```sh
 pnpm add @umahra/ui
 ```
 
-The package contains no CSS assets, theme files, fonts, or runtime theme provider.
-Your project owns its CSS, theme overrides, fonts, and font loading.
+## Configure styles
 
-1. Set up Tailwind CSS v4 using the [official instructions for your framework](https://tailwindcss.com/docs/installation).
-   For plain HTML, follow the [Tailwind CLI guide](https://tailwindcss.com/docs/installation/tailwind-cli).
-2. Install the build-time packages imported by the recipe:
+Copy the stylesheet below into your project's global CSS file. Replace your existing Tailwind import with this setup to avoid duplicate imports.
 
-   ```sh
-   pnpm add -D tailwindcss@4.3.3 shadcn@4.21.4 tw-animate-css@1.4.0
-   ```
-
-   Keep your framework's Tailwind adapter on the compatible v4 version. For the plain HTML
-   CLI path, also run `pnpm add -D @tailwindcss/cli@4.3.3`.
-3. Copy the complete recipe below into your project's global stylesheet, and load that
-   stylesheet through your framework entrypoint. For plain HTML, compile with
-   `pnpm exec tailwindcss -i ./input.css -o ./output.css` and link `output.css` from the page.
-   Replace an existing Tailwind import rather than duplicating it.
-
-These recipe dependencies belong to the consuming project's build. No import points
-into `@umahra/ui`. No component utilities, React dependencies, or shadcn scaffolding
-are needed for this foundation.
-
-## Project-owned global stylesheet
-
-This is the neutral light/dark recipe from [shadcn's manual installation guide](https://ui.shadcn.com/docs/installation/manual).
-It keeps the upstream semantic names, foreground pairs, Tailwind mappings, dark variant,
-base styles, and radius relationships. The numeric radius is `0.625rem` without a space.
+These global styles provide the theme variables, semantic utilities, and base styles
+used by Umahra UI and shadcn components. Your application must load them; `@umahra/ui`
+does not import a stylesheet for you.
 
 ```css
 @import "tailwindcss";
@@ -204,31 +209,21 @@ Your copied CSS is project-owned: later README or package upgrades do not automa
 replace it. Review and apply recipe changes deliberately. Published package fixes reach
 projects through explicit dependency upgrades.
 
-## License and upstream notice
+## Contributing
 
-The package is [MIT licensed](LICENSE). The CSS recipe is adapted from
-[shadcn/ui](https://github.com/shadcn-ui/ui), also MIT licensed. Its notice follows:
+See [CONTRIBUTING.md](https://github.com/umahra/ui/blob/main/CONTRIBUTING.md)
+for development and contribution instructions.
 
-```text
-MIT License
+## License
 
-Copyright (c) 2023 shadcn
+[MIT](LICENSE). The CSS recipe is adapted from shadcn/ui, also available under the
+[MIT license](https://github.com/shadcn-ui/ui/blob/main/LICENSE.md).
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## Credits
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+[shadcn/ui](https://ui.shadcn.com) provides the theme conventions and CSS foundation
+used by Umahra UI. Its approach to composable, customizable components is the
+foundation we build on.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-```
+Thank you, shadcn, for the care you've put into shadcn/ui and for sharing your work
+with the community.
