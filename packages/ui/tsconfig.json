@@ -1,0 +1,8 @@
+{
+  "extends": "@umahra/typescript/base.json",
+  "compilerOptions": {
+    "allowJs": false
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "node_modules"]
+}
