@@ -1,4 +1,4 @@
-name: Version packages
+name: Release
 
 on:
   workflow_dispatch:
@@ -13,12 +13,14 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  version:
+  release:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
       contents: write
       pull-requests: write
+      id-token: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -29,10 +31,16 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Create or update version PR
+      - run: npm --version
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm build
+      - run: pnpm --filter @umahra/ui pack --dry-run --json
+      - name: Create version PR or publish packages
         uses: changesets/action@v1.5.3
         with:
           version: pnpm run changeset:version
+          publish: npx changeset publish
           commit: "chore(release): version packages"
           title: "chore(release): version packages"
         env:
