@@ -10,7 +10,9 @@ Explicit user instructions take precedence. Run commands from the repository roo
 private TypeScript configuration. Root `scripts` contains worktree tooling.
 `pnpm-workspace.yaml` discovers `apps/*`, `packages/*`, and `tooling/*`; there is
 currently no application. Do not add a preview app or documentation infrastructure
-without an approved scope. The package README is the authoritative installation guide.
+without an approved scope. `README.md` is the shared repository and installation
+guide, symlinked to `packages/ui/README.md`. Edit that shared file once; its regular
+file location ensures the guide is included when packing the UI package.
 
 The foundation contains no components, runtime dependencies, peer dependencies,
 CSS assets, fonts, or runtime theme provider. Keep the initial `src/index.ts` empty
