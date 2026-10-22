@@ -69,8 +69,8 @@ For a releasable package change, run `pnpm changeset`, select the affected packa
 and semver bump, and commit its `.changeset/*.md` entry with the change. Write a
 sentence describing the user-visible effect. Root tooling and documentation-only
 changes need no changeset. `@umahra/typescript` remains private and excluded from
-versioning/publishing. The initial minor changeset leaves version `0.0.0` until the
-version PR is accepted.
+versioning/publishing. Package versions and changelogs are updated through version
+PRs before publication.
 
 Public packages use MIT, repository metadata for `https://github.com/umahra/ui`,
 public npm access, and `https://registry.npmjs.org`. Only the workspace root and
@@ -177,17 +177,37 @@ description** to that commit's short overall-change body, not the PR description
 ## Version automation and publication
 
 Changesets opens or updates `chore(release): version packages` PRs on `main`.
-The workflow uses `changesets/action@v1.5.3` with its `version` command only.
-There is no `publish` input, npm authentication, package-write permission, or
-publishing command. Merging a version PR does not publish a package.
+The `release.yaml` workflow runs only from `main` on GitHub-hosted runners. It
+installs the locked dependencies, checks lint and types, builds, and inspects the
+package before running `changesets/action@v1.5.3` to create or update the version PR.
+
+The action uses `version: pnpm run changeset:version` and
+`publish: npx changeset publish`. Pending Changesets create or update a version PR.
+When no Changesets remain, the action publishes public packages whose committed
+versions are not already on npm; rerunning it skips published versions. Merging
+a version PR therefore automatically publishes its new package versions after
+the release checks pass, then creates package Git tags and GitHub releases.
+
+Publication uses npm trusted publishing through OpenID Connect (OIDC), with
+`id-token: write` on the release job. npm's trusted publisher must match
+`umahra/ui` and the exact workflow filename `release.yaml`. The pinned Node.js
+runtime includes an npm CLI supporting OIDC. No npm publishing token is stored or
+passed to the workflow. Publishing, package tags, and GitHub releases use the
+Changesets action's standard behavior.
+
+Use the Release workflow's **Run workflow** action on `main` to retry a failed
+publication after resolving its cause. Inspect npm and the run before retrying;
+never change or reuse a version that was already published.
 
 Repository Actions settings must allow GitHub Actions to create PRs. The bootstrap
 enables this setting when account access permits; otherwise record the owner action.
 Bot-created PRs may need **Approve workflows to run** before CI starts. Inspect
 checks and version/changelog/lockfile changes before accepting a version PR.
 
-A public npm release, publication authentication, release tags, GitHub releases,
-and deployment require separate explicit approval. Do not enable publication as
-part of setup or run version mutation/publication merely to verify the foundation.
+The approved continuous delivery workflow publishes versions accepted through
+version PRs and creates their package tags and GitHub releases. Agents still
+require an explicit merge request before integrating a version PR. npm
+trusted-publisher changes and deployment require separate explicit approval. Do
+not run version mutation or publication merely to verify a change.
 Review staged source, diffs, archives, and metadata for private data, credentials,
 unintended formatting churn, and unrelated files before every commit and push.

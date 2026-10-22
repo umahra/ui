@@ -32,7 +32,7 @@ global stylesheet and font loading.
 
 ## Installation
 
-`@umahra/ui` has not been published yet. After the first release, install it with:
+Install `@umahra/ui` with:
 
 ```sh
 pnpm add @umahra/ui
