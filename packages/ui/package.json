@@ -1,6 +1,6 @@
 {
   "name": "@umahra/ui",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "The public Umahra UI package foundation.",
   "type": "module",
   "license": "MIT",
