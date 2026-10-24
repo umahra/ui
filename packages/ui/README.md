@@ -4,8 +4,9 @@ Umahra UI is a public UI library for building websites, using the theme conventi
 of [shadcn/ui](https://ui.shadcn.com). You can use shadcn components alongside Umahra
 UI and customize them with the same project-owned theme CSS.
 
-The library currently provides a component-free foundation with TypeScript
-declarations. Components will be added separately.
+The library provides composable primitives with maintained behavior and structural
+Tailwind styles. Your project owns colors, typography, decorative treatments, size
+variants, and finished component wrappers.
 
 ## Why?
 
@@ -22,6 +23,7 @@ can add or customize shadcn components locally.
 
 Your project should already have:
 
+- React 19 and React DOM 19.
 - [Tailwind CSS v4](https://tailwindcss.com/docs/installation) configured for your framework.
 - `shadcn` installed so the `shadcn/tailwind.css` import resolves. See the
   [official shadcn setup guide](https://ui.shadcn.com/docs/installation).
@@ -38,7 +40,19 @@ Install `@umahra/ui` with:
 pnpm add @umahra/ui
 ```
 
+Dialog requires a release that exports `DialogPrimitive`; the `0.1.1` foundation
+release contains no components. Before the Dialog release, use a locally built
+package archive to try these parts.
+
 ## Configure styles
+
+Register the installed package's emitted JavaScript in your Tailwind v4 stylesheet
+so its literal structural utilities are compiled. The path is relative to your CSS
+file; adjust it for your project layout. For example, from `src/app/globals.css`:
+
+```css
+@source "../../node_modules/@umahra/ui/dist";
+```
 
 Copy the stylesheet below into your project's global CSS file. Replace your existing Tailwind import with this setup to avoid duplicate imports.
 
@@ -174,6 +188,132 @@ does not import a stylesheet for you.
 }
 ```
 
+## Dialog
+
+Import the multipart family and its public types from the package root:
+
+```tsx
+import { DialogPrimitive, type DialogContentProps } from "@umahra/ui";
+```
+
+| Part | Public props type | Purpose |
+| --- | --- | --- |
+| `Root` | `DialogRootProps<Payload>` | Controlled/uncontrolled state and modal behavior |
+| `Trigger` | `DialogTriggerProps<Payload>` | Opens the dialog; supports Base UI `render` composition |
+| `Portal` | `DialogPortalProps` | Portal container and `keepMounted` lifecycle |
+| `Overlay` | `DialogOverlayProps` | Optional visual backdrop |
+| `Viewport` | `DialogViewportProps` | Viewport gutters, centering, and outside scrolling |
+| `Content` | `DialogContentProps` | Accessible dialog surface (Base UI Popup) |
+| `Header` | `DialogHeaderProps` | Optional vertical heading group |
+| `Footer` | `DialogFooterProps` | Optional responsive action group |
+| `Title` | `DialogTitleProps` | Accessible dialog name |
+| `Description` | `DialogDescriptionProps` | Optional associated description |
+| `Close` | `DialogCloseProps` | Explicit consumer-labelled close control |
+
+`Content` renders only the surface. Compose Portal, Overlay, Viewport, and Close
+explicitly; no close icon or Button is inserted. The default Viewport centers short
+content and scrolls tall content without clipping its beginning. Content fills the
+available width; apply your own maximum width. Header and Footer are optional.
+
+For example, your application can own a styled content wrapper. Here `cn` is your
+application's Tailwind class-merging helper:
+
+```tsx
+"use client";
+
+import { DialogPrimitive, type DialogContentProps } from "@umahra/ui";
+import { cn } from "@/lib/utils";
+
+interface AppDialogContentProps extends DialogContentProps {
+  closeLabel?: string;
+}
+
+export function AppDialogContent({
+  closeLabel = "Close",
+  className,
+  children,
+  ...props
+}: AppDialogContentProps) {
+  const appearance = "max-w-lg rounded-xl bg-background p-6 text-foreground shadow-xl";
+
+  return (
+    <DialogPrimitive.Portal>
+      <DialogPrimitive.Overlay className="bg-black/40" />
+      <DialogPrimitive.Viewport>
+        <DialogPrimitive.Content
+          {...props}
+          className={typeof className === "function"
+            ? (state) => cn(appearance, className(state))
+            : cn(appearance, className)}
+        >
+          {children}
+          <DialogPrimitive.Close className="absolute end-3 top-3">
+            {closeLabel}
+          </DialogPrimitive.Close>
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Viewport>
+    </DialogPrimitive.Portal>
+  );
+}
+```
+
+Then compose it in a server or client component:
+
+```tsx
+<DialogPrimitive.Root>
+  <DialogPrimitive.Trigger render={<button className="your-button" />}>
+    Edit profile
+  </DialogPrimitive.Trigger>
+  <AppDialogContent>
+    <DialogPrimitive.Header>
+      <DialogPrimitive.Title>Edit profile</DialogPrimitive.Title>
+      <DialogPrimitive.Description>Update your display name.</DialogPrimitive.Description>
+    </DialogPrimitive.Header>
+    {/* Your form and actions */}
+  </AppDialogContent>
+</DialogPrimitive.Root>
+```
+
+Dialog parts preserve their client boundaries; static composition can be rendered
+from a server component. State, event handlers, refs, and function-valued props
+belong in a consumer client component. Root supports `open`, `defaultOpen`,
+`onOpenChange`, and Base UI's cancellable change details. Close only after a
+successful async submit by controlling `open` in your application; a submit button
+does not need to be wrapped in Close.
+
+Use `render`, including its callback form, to compose controls; do not use `asChild`.
+When rendering a non-button control, follow Base UI's `nativeButton={false}`
+contract. Custom components must forward props and refs. Native attributes, refs,
+events, and Base UI's state callbacks for `className` and `style` are retained.
+Consumer classes merge after structural defaults on styled parts. DOM parts expose
+`data-slot="dialog-…"` hooks and preserve Base UI's state and transition attributes.
+
+Provide Title or an explicit accessible name on Content. Description is optional.
+For modal dialogs, render an accessible Close inside Content so touch screen reader
+users can leave the dialog. Localize its label in your wrapper. Native keyboard
+focus remains visible unless your project deliberately replaces its styling.
+
+The default modal behavior traps focus, locks document scrolling, and prevents
+outside interaction. Base UI owns Escape/outside dismissal, nested-dialog behavior,
+and initial/return focus; pass `initialFocus`, `finalFocus`, or Root's dismissal
+props when needed. In nonmodal and `modal="trap-focus"` modes, Viewport passes
+outside pointer interactions through and Content scrolls within the available
+height. Overlay is pointer-transparent in all modes; Base UI owns modal outside
+interaction safeguards. See the [Base UI Dialog API](https://base-ui.com/react/components/dialog).
+
+For a fixed header/footer with an inner scrolling body, give Content
+`className="flex max-h-[calc(100dvh-2rem)] flex-col"`, render your body in
+`<div className="min-h-0 flex-1 overflow-y-auto">`, and add `shrink-0` to Header and
+Footer. No Body component or scroll-mode prop is required. Consumers can add motion
+using Base UI's `data-starting-style` and `data-ending-style` hooks; keep reduced
+motion preferences and Base UI's closing lifecycle intact.
+
+The Dialog source is adapted from the official shadcn Base UI registry, retrieved
+24 October 2026 at
+[`e55b60b`](https://github.com/shadcn-ui/ui/blob/e55b60b1014cccfb9ac62f97e0d20b5b649f4a54/apps/v4/registry/bases/base/ui/dialog.tsx).
+Umahra unbundles the portal/overlay/close controls, exposes Base UI Viewport, moves
+centering into the scrolling viewport, and removes consumer visual design.
+
 ## Theme and font ownership
 
 Set `class="dark"` on your document's `html` element to select the dark palette; remove
@@ -216,7 +356,7 @@ for development and contribution instructions.
 
 ## License
 
-[MIT](LICENSE). The CSS recipe is adapted from shadcn/ui, also available under the
+[MIT](LICENSE). Dialog and the CSS recipe are adapted from shadcn/ui, also available under the
 [MIT license](https://github.com/shadcn-ui/ui/blob/main/LICENSE.md).
 
 ## Credits

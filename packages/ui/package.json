@@ -1,7 +1,7 @@
 {
   "name": "@umahra/ui",
   "version": "0.1.1",
-  "description": "The public Umahra UI package foundation.",
+  "description": "Composable UI primitives with consumer-owned visual design.",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -36,7 +36,19 @@
     "clean": "node --input-type=module -e 'import { rmSync } from \"node:fs\"; for (const path of [\"dist\", \"tsconfig.tsbuildinfo\"]) rmSync(path, { recursive: true, force: true });'"
   },
   "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
     "@umahra/typescript": "workspace:*",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
     "typescript": "5.9.3"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "dependencies": {
+    "@base-ui/react": "1.9.0",
+    "cn": "0.5.0"
   }
 }
