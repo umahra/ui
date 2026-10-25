@@ -14,16 +14,21 @@ without an approved scope. `README.md` is the shared repository and installation
 guide, symlinked to `packages/ui/README.md`. Edit that shared file once; its regular
 file location ensures the guide is included when packing the UI package.
 
-The foundation contains no components, runtime dependencies, peer dependencies,
-CSS assets, fonts, or runtime theme provider. Keep the initial `src/index.ts` empty
-except for `export {}`. Future approved component work may evolve this boundary.
+`packages/ui/src` contains the approved components and public entrypoint. Components
+use a React 19 peer and inline Tailwind v4 utility classes. Consumers register
+package `dist` with `@source` in their global stylesheet. Keep full utility names
+in source and register custom typography sizes with the internal `cn` merger so
+same-variant overrides resolve correctly. Each heading selects its own `text-h*`
+utility; responsive token values belong in the copied global theme recipe using
+`:root` and Tailwind `@variant`, outside `@theme`. The package loads no CSS, fonts,
+or runtime theme provider. Add further components only within their approved scope.
 Consumers own the README's copied theme CSS, font choices/loading, and overrides.
 Use upstream shadcn semantics and Tailwind's existing spacing utilities. Do not add
 speculative UI APIs, theme vocabularies, or sizing abstractions.
 
 ## Setup and scripts
 
-Use Node.js **24.16.0**, pinned in `.nvmrc` (supported minimum 22.18), and pnpm
+Use Node.js **24.22.1**, pinned in `.nvmrc` (supported minimum 22.18), and pnpm
 **10.34.4**, pinned in `package.json`. Git is required for worktrees; GitHub CLI
 with access to `umahra/ui` is required for delivery and guarded cleanup.
 No backend services, private registries, or local environment files are required.
@@ -55,11 +60,11 @@ configuration, exports, or user behavior changes.
 
 `packages/ui/tsconfig.json` extends `@umahra/typescript/base.json` for strict checks.
 `tsconfig.build.json` emits JavaScript and declarations from `src` into `dist`.
-The package root exports ESM `dist/index.js` and types `dist/index.d.ts` only.
-Do not advertise CommonJS, CSS, wildcard, or component exports before they exist.
-`sideEffects: false` describes the empty package; revisit it when adding side effects.
+The package root exports ESM `dist/index.js` and types `dist/index.d.ts`.
+The JavaScript entrypoint has no side effects; the package exports no stylesheet.
+Do not advertise CommonJS, wildcard, or further exports before they exist.
 
-The initial archive allowlist is `dist`, `README.md`, and `LICENSE`, plus package
+The archive allowlist is `dist`, `README.md`, and `LICENSE`, plus package
 metadata included by the packer. Keep root/package MIT license texts identical and
 preserve upstream notices in adapted material, including the README CSS recipe.
 Inspect both the pack dry-run and actual tarball before delivery. Public artifacts
@@ -97,9 +102,18 @@ git diff --check
 Pack a real archive outside the repository with
 `pnpm --filter @umahra/ui pack --out /absolute/scratch/path/umahra-ui.tgz`.
 Inspect it with `tar -tzf`, review its metadata, and install it into a fresh external
-temporary consumer. Confirm the ESM namespace is empty and TypeScript resolves the
-root declarations without private registry credentials. Verify a frozen install in
-a fresh temporary checkout without inherited `node_modules` when setup changes.
+temporary consumer. Confirm the expected component exports and TypeScript root
+declarations resolve without private registry credentials. Check native elements,
+attributes, refs, server rendering, theme variables, responsive defaults, and utility
+overrides for Heading and Text using the exact README recipe.
+For Button, also check variants/sizes, native disabled and form behavior, keyboard
+activation/focus, icon names, and Radix Slot child props/events/refs for links.
+For Dialog, also check public part/props exports, Base UI render composition and state
+callbacks, server/client boundaries, focus/keyboard/dismissal, portal/nested behavior,
+modal and nonmodal scrolling, and optional consumer composition. Dialog keeps its
+necessary client boundary; the package root preserves per-part client references.
+Verify a frozen install in a fresh temporary checkout without inherited
+`node_modules` when setup changes.
 
 For CSS recipe changes, copy the exact documented recipe into the temporary
 consumer. Install the documented build dependencies, compile it, and inspect a

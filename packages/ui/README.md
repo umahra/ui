@@ -4,8 +4,8 @@ Umahra UI is a public UI library for building websites, using the theme conventi
 of [shadcn/ui](https://ui.shadcn.com). You can use shadcn components alongside Umahra
 UI and customize them with the same project-owned theme CSS.
 
-The library currently provides a component-free foundation with TypeScript
-declarations. Components will be added separately.
+The library provides maintained components with project-owned theme values and
+fonts.
 
 ## Why?
 
@@ -22,13 +22,15 @@ can add or customize shadcn components locally.
 
 Your project should already have:
 
+- React 19 and React DOM 19. TypeScript projects also need matching React typings.
 - [Tailwind CSS v4](https://tailwindcss.com/docs/installation) configured for your framework.
 - `shadcn` installed so the `shadcn/tailwind.css` import resolves. See the
   [official shadcn setup guide](https://ui.shadcn.com/docs/installation).
 - `tw-animate-css` installed for the animation styles imported by the stylesheet.
 
-These are build-time dependencies of your project. Your project also owns its
-global stylesheet and font loading.
+Tailwind, shadcn, and tw-animate-css are build-time dependencies of your project;
+React and React DOM are runtime peers. Your project also owns its global stylesheet
+and font loading.
 
 ## Installation
 
@@ -43,15 +45,60 @@ pnpm add @umahra/ui
 Copy the stylesheet below into your project's global CSS file. Replace your existing Tailwind import with this setup to avoid duplicate imports.
 
 These global styles provide the theme variables, semantic utilities, and base styles
-used by Umahra UI and shadcn components. Your application must load them; `@umahra/ui`
-does not import a stylesheet for you.
+used by Umahra UI and shadcn components. Register the installed package with
+Tailwind's `@source` directive so its utility classes are included in your build.
+The example assumes `src/globals.css`; adjust the path relative to your stylesheet.
+See [Tailwind source registration](https://tailwindcss.com/docs/detecting-classes-in-source-files#explicitly-registering-sources).
+
+Typography values start in `@theme` and change in `:root` through `@variant sm`,
+using your configured Tailwind breakpoint. Customize each `--text-h*` variable
+and its companions there; use other named variants for additional transitions.
+Line-height values are unitless ratios that scale with the font size.
 
 ```css
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@source "../node_modules/@umahra/ui/dist";
 
 @custom-variant dark (&:is(.dark *));
+
+@theme {
+  --text-body: 1rem;
+  --text-body--line-height: 1.5;
+  --text-body--font-weight: 400;
+  --text-body--letter-spacing: 0em;
+
+  --text-h1: 2.25rem;
+  --text-h1--line-height: 1.2;
+  --text-h1--font-weight: 600;
+  --text-h1--letter-spacing: -0.02em;
+
+  --text-h2: 1.75rem;
+  --text-h2--line-height: 1.25;
+  --text-h2--font-weight: 600;
+  --text-h2--letter-spacing: -0.015em;
+
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.4;
+  --text-h3--font-weight: 600;
+  --text-h3--letter-spacing: -0.01em;
+
+  --text-h4: 1.25rem;
+  --text-h4--line-height: 1.4;
+  --text-h4--font-weight: 600;
+  --text-h4--letter-spacing: -0.01em;
+
+  --text-h5: 1.125rem;
+  --text-h5--line-height: 1.4;
+  --text-h5--font-weight: 600;
+  --text-h5--letter-spacing: 0em;
+
+  --text-h6: 1rem;
+  --text-h6--line-height: 1.5;
+  --text-h6--font-weight: 600;
+  --text-h6--letter-spacing: 0em;
+}
 
 @theme inline {
   --color-background: var(--background);
@@ -96,6 +143,20 @@ does not import a stylesheet for you.
 }
 
 :root {
+  @variant sm {
+    --text-h1: 3rem;
+    --text-h1--line-height: 1.1;
+    --text-h1--letter-spacing: -0.025em;
+
+    --text-h2: 2.25rem;
+    --text-h2--line-height: 1.2;
+    --text-h2--letter-spacing: -0.02em;
+
+    --text-h3: 1.75rem;
+    --text-h3--line-height: 1.25;
+    --text-h3--letter-spacing: -0.015em;
+  }
+
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
