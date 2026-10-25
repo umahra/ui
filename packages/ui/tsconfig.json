@@ -3,6 +3,12 @@
   "compilerOptions": {
     "allowJs": false
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx"],
-  "exclude": ["dist", "node_modules"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "*.ts",
+    "playground/**/*.ts",
+    "playground/**/*.tsx"
+  ],
+  "exclude": ["dist", "node_modules", ".playground-dist"]
 }
