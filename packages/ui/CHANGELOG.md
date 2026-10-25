@@ -1,5 +1,11 @@
 # @umahra/ui
 
+## 0.2.0
+
+### Minor Changes
+
+- [#5](https://github.com/umahra/ui/pull/5) [`670115a`](https://github.com/umahra/ui/commit/670115a4d14b6270ac6782d075e186b67b290745) Thanks [@IDJGILL](https://github.com/IDJGILL)! - Add Heading, Text, Button, and composable Base UI Dialog primitives with project-owned themes, responsive typography, button appearance and size variants, structural dialog scrolling, public props types, and CSS utility overrides.
+
 ## 0.1.1
 
 ### Patch Changes
