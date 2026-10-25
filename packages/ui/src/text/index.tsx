@@ -1,6 +1,6 @@
 import type { ComponentPropsWithRef } from "react";
 
-import { cn } from "./cn.js";
+import { cn } from "../cn";
 
 export type TextProps =
   | (ComponentPropsWithRef<"p"> & { as?: "p" })

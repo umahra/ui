@@ -14,7 +14,8 @@
     "format": "biome format --write",
     "clean": "turbo run clean",
     "changeset:version": "changeset version && pnpm install --lockfile-only",
-    "worktree:sweep": "node scripts/sweep-worktrees.mjs"
+    "worktree:sweep": "node scripts/sweep-worktrees.mjs",
+    "dev": "pnpm --filter @umahra/ui dev"
   },
   "devDependencies": {
     "@biomejs/biome": "2.4.2",
