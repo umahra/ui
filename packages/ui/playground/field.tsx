@@ -1,8 +1,6 @@
 import { useState } from "react";
-
 import { ButtonPrimitive as Button } from "../src/button";
 import { FieldPrimitive as Field } from "../src/field";
-import { Heading } from "../src/heading";
 import {
   InputGroupPrimitive as InputGroup,
   InputPrimitive,
@@ -10,6 +8,7 @@ import {
 import { LabelPrimitive } from "../src/label";
 import { Text } from "../src/text";
 import { TextareaPrimitive } from "../src/textarea";
+import type { DesignSystemComponent } from "../src/visualiser";
 
 const controlClasses =
   "rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive";
@@ -18,7 +17,7 @@ const buttonClasses =
 const separatorClasses =
   "h-5 [&_[data-slot=separator]]:h-px [&_[data-slot=separator]]:bg-border [&_[data-slot=field-separator-content]]:bg-background [&_[data-slot=field-separator-content]]:px-2";
 
-export function FieldExamples() {
+export function useFieldExamples(): DesignSystemComponent {
   const [invalid, setInvalid] = useState(false);
   const [multiple, setMultiple] = useState(false);
   const [disabled, setDisabled] = useState(false);
@@ -34,29 +33,18 @@ export function FieldExamples() {
       ]
     : [];
 
-  return (
-    <section
-      id="field"
-      aria-labelledby="field-title"
-      className="component-section"
-    >
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">07 / Composition</p>
-          <Heading as="h2" id="field-title">
-            Field
-          </Heading>
-        </div>
-        <code>FieldPrimitive</code>
-      </div>
-      <Text className="section-description">
-        Compose labels, controls, descriptions, and errors with explicit IDs.
-        Field owns layout; your form owns validation, appearance, and spacing.
-      </Text>
-      <div className="examples-grid">
-        <div className="example">
-          <p className="example-label">Primitive · vertical layout</p>
-          <div className="example-body">
+  return {
+    id: "field",
+    name: "Field",
+    description: "Form fields with labels, help text and validation messages.",
+    importCode: 'import { FieldPrimitive as Field } from "@umahra/ui/field";',
+    examples: [
+      {
+        title: "Primitive · vertical layout",
+        usage:
+          '<Field.Root>\n  <Field.Label htmlFor="name">Name</Field.Label>\n  <InputPrimitive id="name" />\n  <Field.Description>Your display name.</Field.Description>\n</Field.Root>',
+        preview: (
+          <div className="project-preview">
             <Field.Root>
               <Field.Label htmlFor="field-name">Account name</Field.Label>
               <InputPrimitive
@@ -69,13 +57,15 @@ export function FieldExamples() {
               </Field.Description>
             </Field.Root>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">
-            Consumer wrapper · errors and native form
-          </p>
+        ),
+      },
+      {
+        title: "Consumer wrapper · errors and native form",
+        usage:
+          '<Field.Root data-invalid={invalid}>\n  <Field.Label htmlFor="email">Email</Field.Label>\n  <InputPrimitive id="email" name="email" aria-invalid={invalid} aria-describedby="email-error" />\n  <Field.Error id="email-error" errors={errors} />\n</Field.Root>',
+        preview: (
           <form
-            className="example-body space-y-4"
+            className="project-preview space-y-4"
             onSubmit={(event) => {
               event.preventDefault();
               if (invalid) {
@@ -154,12 +144,14 @@ export function FieldExamples() {
               {submitted}
             </Text>
           </form>
-        </div>
-        <div className="example md:col-span-2">
-          <p className="example-label">
-            Responsive field group · input group, textarea and fieldset
-          </p>
-          <div className="example-body space-y-5">
+        ),
+      },
+      {
+        title: "Responsive field group · input group, textarea and fieldset",
+        usage:
+          '<Field.Set>\n  <Field.Legend>Project details</Field.Legend>\n  <Field.Group>\n    <Field.Root orientation="responsive">\n      <Field.Label htmlFor="notes">Notes</Field.Label>\n      <Field.Content><TextareaPrimitive id="notes" /></Field.Content>\n    </Field.Root>\n  </Field.Group>\n</Field.Set>',
+        preview: (
+          <div className="project-preview space-y-5">
             <Field.Set
               className="gap-4"
               disabled={disabled}
@@ -256,12 +248,14 @@ export function FieldExamples() {
               Disable profile fieldset
             </LabelPrimitive>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">
-            Horizontal choice card · label, title and content
-          </p>
-          <div className="example-body">
+        ),
+      },
+      {
+        title: "Horizontal choice card · label, title and content",
+        usage:
+          '<Field.Label>\n  <Field.Root orientation="horizontal">\n    <input type="checkbox" />\n    <Field.Content><Field.Title>Notifications</Field.Title>\n      <Field.Description>Receive updates.</Field.Description>\n    </Field.Content>\n  </Field.Root>\n</Field.Label>',
+        preview: (
+          <div className="project-preview">
             <Field.Label
               htmlFor="field-choice"
               className="rounded-md border border-border p-4 has-[:checked]:border-ring has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ring"
@@ -290,12 +284,14 @@ export function FieldExamples() {
               </Field.Root>
             </Field.Label>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">
-            Error content · optional and consumer-owned
-          </p>
-          <div className="example-body space-y-3">
+        ),
+      },
+      {
+        title: "Error content · optional and consumer-owned",
+        usage:
+          '<Field.Error errors={[{ message: "Check this value." }]} />\n<Field.Error>Consumer-owned error content.</Field.Error>',
+        preview: (
+          <div className="project-preview space-y-3">
             <Field.Error
               errors={errors}
               className="text-sm text-destructive [&_ul]:list-inside [&_ul]:list-disc"
@@ -307,8 +303,8 @@ export function FieldExamples() {
               Empty errors render nothing. Duplicate messages appear once.
             </Text>
           </div>
-        </div>
-      </div>
-    </section>
-  );
+        ),
+      },
+    ],
+  };
 }

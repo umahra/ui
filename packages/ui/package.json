@@ -99,6 +99,10 @@
     "./carousel": {
       "types": "./dist/carousel.d.ts",
       "import": "./dist/carousel.js"
+    },
+    "./visualiser": {
+      "types": "./dist/visualiser.d.ts",
+      "import": "./dist/visualiser.js"
     }
   },
   "sideEffects": false,

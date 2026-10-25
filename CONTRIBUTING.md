@@ -27,8 +27,9 @@ package `dist` with `@source` in their global stylesheet. Keep full utility name
 in source and register custom typography sizes with the internal `cn` merger so
 same-variant overrides resolve correctly. Each heading selects its own `text-h*`
 utility; responsive token values belong in the copied global theme recipe using
-`:root` and Tailwind `@variant`, outside `@theme`. The package loads no CSS, fonts,
-or runtime theme provider. Add further components only within their approved scope.
+`:root` and Tailwind `@variant`, outside `@theme`. Primitive imports load no CSS, fonts,
+or runtime theme provider. DesignSystem loads its local documentation font
+only when mounted. Add further components only within their approved scope.
 Consumers own the README's copied theme CSS, font choices/loading, and overrides.
 Use upstream shadcn semantics. Visual styles, including transitions, animations,
 opacity effects, motion transforms, padding, margins, gaps, and space utilities,
@@ -55,10 +56,10 @@ pnpm install --frozen-lockfile
 Confirm pnpm's version before installing. Root `package.json` owns script definitions:
 
 - `pnpm build`: build workspace output with Turbo; the UI package runs `tsdown`.
-- `pnpm dev`: open the Vite component playground at `http://127.0.0.1:5173`.
+- `pnpm dev`: open the Vite design-system visualiser at `http://127.0.0.1:5173`.
 - `pnpm --filter @umahra/ui dev:package`: rebuild the library with tsdown in watch mode.
-- `pnpm --filter @umahra/ui build:playground`: build the showcase into `.playground-dist`.
-- `pnpm --filter @umahra/ui preview`: serve that showcase build at `http://127.0.0.1:4173`.
+- `pnpm --filter @umahra/ui build:playground`: build the visualiser into `.playground-dist`.
+- `pnpm --filter @umahra/ui preview`: serve that visualiser build at `http://127.0.0.1:4173`.
 - `pnpm typecheck`: check workspace types, including build configuration, without emitting JavaScript.
 - `pnpm lint`: Biome lint and formatting checks, including root tooling.
 - `pnpm format <intended-path>`: format only intended files.
@@ -72,26 +73,59 @@ Never commit dependencies, caches, environment files, credentials, package archi
 or generated build output. Update the relevant README when commands, installation,
 configuration, exports, or user behavior changes.
 
-## Component playground
+## Design-system visualiser
 
-The Vite playground displays every public component and consumer-owned wrappers.
-Use it for development with React Fast Refresh, light/dark themes, narrow layouts,
-RTL, loading/disabled/error states, native forms, and Dialog focus/dismissal/scrolling.
-When adding a public component, add its relevant examples here. Example appearance
-classes and theme CSS stay in the playground; do not move them into primitives.
+`packages/ui/playground` is the single maintained visualiser. `pnpm dev` serves it
+at `http://127.0.0.1:5173`; `pnpm --filter @umahra/ui build:playground` builds the
+static application, and `pnpm --filter @umahra/ui preview` serves it at
+`http://127.0.0.1:4173`. No backend credentials are required.
 
-The playground imports individual `src` modules for immediate feedback, using
-named primitive namespace imports for multipart components and named imports for single parts. Its stylesheet starts from the
-README theme recipe and registers package source with Tailwind. Keep those theme
-values aligned when the installation recipe changes. Typecheck and lint include
-playground code. `build` remains the tsdown library build; `build:playground` is a
-separate Vite application build. Neither the Vite config nor playground source or
-`.playground-dist` belongs in the published artifact. Do not point Vite at `dist`.
+`src/visualiser` owns the reusable client `DesignSystem` renderer, foundation
+inspection, internal ComponentBlock/Preview/Code composition and a licensed
+documentation font. Keep its appearance in inline Tailwind utilities. The optional `@umahra/ui/visualiser` entry exports
+DesignSystem and its public props/data types. There is no separate stylesheet or
+CSS export; consumer Tailwind scans `dist`. Keep this entry out of the primitive root graph.
 
-The playground supports manual checks; it is not a screenshot comparison runner
-or proof that the npm archive or Server Component boundaries work. Keep real
-package tarball and framework-consumer verification outside the repository. No
-automated tests, test scripts, or testing dependencies are introduced.
+`playground/app.tsx` supplies the same public `components` array a consumer uses.
+Each `use*Examples` hook returns a DesignSystemComponent record with stable id,
+name, description, optional importCode and examples containing title/usage/preview.
+Keep hook calls unconditional and preserve each example's interactive state,
+forms, refs, accessibility and authored usage. ComponentBlock is internal; do not
+reintroduce an arbitrary section-content API or a duplicate playground shell.
+
+Colors and Fonts & Typography are built in. Optional colors (name/variable) and
+typography (name/className) append project-defined specimens. Metadata stores
+identifiers, never duplicated theme values. `useEffectiveStyles` measures project
+specimens and refreshes on mount, resize, theme/scope attribute changes, font
+readiness and stylesheet updates, including Vite CSS hot changes. Clean up all
+observers/listeners. Show missing/unresolved tokens and never claim configured
+font stacks identify the rendered font for each glyph.
+
+The page stays continuous with mounted examples, native anchors/history,
+intersection-based active links, a skip link, fixed desktop sidebar and compact
+mobile nav. Menu navigation is instant. Titles/descriptions, code, labels and
+navigation opt into documentation typography; never apply chrome resets to a
+parent containing consumer previews or body-mounted portals. Viewing surfaces
+use the project's background. Renderer appearance lives on its elements as
+inline Tailwind classes; project theme recipes and example appearance stay in
+`playground/globals.css`. Do not define duplicates of Tailwind utilities such as
+`sr-only`. Custom typography specimens use plain paragraphs with consumer classes.
+Heading and Text inherit font family; consumers select families with standard
+Tailwind `font-*` utilities and project-owned `--font-*` theme tokens.
+
+Use DesignSystem once in a dedicated full-page route. Respect external theme
+classes and inherited direction; global theme/RTL/narrow controls, persistence
+and token editing remain deferred. Restore temporary theme/direction/viewport
+changes after verification. Preserve the user's preview service and stop other
+services started for checks.
+
+Typecheck/lint cover both renderer and examples. `build` packages reusable JS,
+declarations and its font/license through tsdown;
+`build:playground` separately builds the maintained Vite preview. Keep local
+examples, Vite configuration, project theme CSS and `.playground-dist` out of
+runtime exports and npm archives. Shared API or Heading runtime changes require
+a Changeset and real packed-consumer checks. Primitive imports must not load
+DesignSystem code, styles or fonts. Do not add automated tests or test dependencies.
 
 ## Package and artifact boundaries
 
@@ -111,7 +145,8 @@ module assembles its namespace from a separate `.parts.tsx` implementation;
 client directives stay with the parts that need them. Single-component modules
 retain their existing named exports. The root re-exports the same namespaces and
 types. Do not export a namespace object from a client module.
-The entrypoints have no side effects; the package exports no stylesheet.
+JavaScript entrypoints have no stylesheet imports. The DesignSystem entry uses
+inline Tailwind classes and loads its local documentation font when mounted.
 Do not advertise CommonJS, wildcard, or further exports before they exist.
 
 The archive allowlist is `dist`, `README.md`, and `LICENSE`, plus package

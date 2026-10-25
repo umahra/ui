@@ -1,21 +1,14 @@
 import { cn } from "cn";
-import {
-  type ReactNode,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ButtonPrimitive as Button } from "../src/button";
 import {
   CarouselPrimitive as Carousel,
   type CarouselApi,
   type CarouselItemProps,
 } from "../src/carousel";
-import { Heading } from "../src/heading";
 import { InputPrimitive } from "../src/input";
 import { LabelPrimitive as Label } from "../src/label";
+import type { DesignSystemComponent } from "../src/visualiser";
 
 const buttonClasses =
   "rounded-md border border-input bg-background px-3 py-2 text-sm hover:bg-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-disabled:opacity-40";
@@ -34,15 +27,6 @@ function ConsumerSlide({ featured, className, ...props }: ConsumerSlideProps) {
         className,
       )}
     />
-  );
-}
-
-function Example({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="example min-w-0">
-      <p className="example-label">{title}</p>
-      <div className="example-body">{children}</div>
-    </div>
   );
 }
 
@@ -71,7 +55,11 @@ function Position({ api }: { api: CarouselApi }) {
   );
 }
 
-export function CarouselExamples({ direction }: { direction: "ltr" | "rtl" }) {
+export function useCarouselExamples({
+  direction,
+}: {
+  direction: "ltr" | "rtl";
+}): DesignSystemComponent {
   const [api, setApi] = useState<CarouselApi>();
   const [verticalApi, setVerticalApi] = useState<CarouselApi>();
   const [count, setCount] = useState(5);
@@ -96,68 +84,68 @@ export function CarouselExamples({ direction }: { direction: "ltr" | "rtl" }) {
   const contentRef = useRef<HTMLDivElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
 
-  return (
-    <section
-      id="carousel"
-      aria-labelledby="carousel-title"
-      className="component-section"
-    >
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">17 / Collections</p>
-          <Heading as="h2" id="carousel-title">
-            Carousel
-          </Heading>
-        </div>
-        <code>CarouselPrimitive</code>
-      </div>
-      <p className="section-description">
-        Focus the carousel itself for arrow shortcuts. Tab reaches controls and
-        slide content. Spacing, cards, dimensions, and control appearance belong
-        to these wrappers.
-      </p>
-      <div className="examples-grid">
-        <Example title="Primitive · structural defaults / optional controls">
-          <Carousel.Root aria-label="Plain carousel" dir={direction}>
-            <Carousel.Viewport>
-              <Carousel.Content>
-                {[1, 2, 3].map((slide) => (
-                  <Carousel.Item key={slide} aria-label={`${slide} of 3`}>
-                    Plain slide {slide}
-                  </Carousel.Item>
-                ))}
-              </Carousel.Content>
-            </Carousel.Viewport>
-          </Carousel.Root>
-          <p className="mt-3 text-sm text-muted-foreground">
-            No navigation buttons, spacing, card styles, or icon dependencies.
-          </p>
-        </Example>
-        <Example title="Consumer wrapper · responsive / dynamic / events / forms">
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              setSubmitted((value) => value + 1);
-            }}
-          >
-            {mounted && (
-              <Carousel.Root
-                aria-label="Project carousel"
-                aria-describedby="carousel-project-hint"
-                dir={direction}
-                opts={{ align: "start", loop }}
-                setApi={setApi}
-                onKeyDown={(event) => {
-                  if (cancel) event.preventDefault();
-                }}
-              >
-                <Carousel.Viewport
-                  ref={viewportCallback}
-                  className="rounded-lg"
+  return {
+    id: "carousel",
+    name: "Carousel",
+    description: "A sequence of slides with navigation controls.",
+    importCode:
+      'import { CarouselPrimitive as Carousel } from "@umahra/ui/carousel";',
+    examples: [
+      {
+        title: "Primitive · structural defaults / optional controls",
+        usage:
+          '<Carousel.Root aria-label="Featured items">\n  <Carousel.Viewport><Carousel.Content>\n    <Carousel.Item>First slide</Carousel.Item>\n    <Carousel.Item>Second slide</Carousel.Item>\n  </Carousel.Content></Carousel.Viewport>\n  <Carousel.Previous>Previous</Carousel.Previous>\n  <Carousel.Next>Next</Carousel.Next>\n</Carousel.Root>',
+        preview: (
+          <div className="space-y-4">
+            <Carousel.Root aria-label="Plain carousel" dir={direction}>
+              <Carousel.Viewport>
+                <Carousel.Content>
+                  {[1, 2, 3].map((slide) => (
+                    <Carousel.Item key={slide} aria-label={`${slide} of 3`}>
+                      Plain slide {slide}
+                    </Carousel.Item>
+                  ))}
+                </Carousel.Content>
+              </Carousel.Viewport>
+            </Carousel.Root>
+            <p className="mt-3 text-sm text-muted-foreground">
+              No navigation buttons, spacing, card styles, or icon dependencies.
+            </p>
+          </div>
+        ),
+      },
+      {
+        title: "Consumer wrapper · responsive / dynamic / events / forms",
+        usage:
+          '<Carousel.Root opts={{ loop }} setApi={setApi}>\n  <Carousel.Viewport><Carousel.Content className="-ms-4">\n    {slides.map(slide => <Carousel.Item key={slide.id} className="ps-4 sm:basis-1/2">{slide.content}</Carousel.Item>)}\n  </Carousel.Content></Carousel.Viewport>\n</Carousel.Root>',
+        preview: (
+          <div className="space-y-4">
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                setSubmitted((value) => value + 1);
+              }}
+            >
+              {mounted && (
+                <Carousel.Root
+                  aria-label="Project carousel"
+                  aria-describedby="carousel-project-hint"
+                  dir={direction}
+                  opts={{ align: "start", loop }}
+                  setApi={setApi}
+                  onKeyDown={(event) => {
+                    if (cancel) event.preventDefault();
+                  }}
                 >
-                  <Carousel.Content ref={contentRef} className="gap-4">
-                    {Array.from({ length: count }, (_, index) => index + 1).map(
-                      (slide) => (
+                  <Carousel.Viewport
+                    ref={viewportCallback}
+                    className="rounded-lg"
+                  >
+                    <Carousel.Content ref={contentRef} className="gap-4">
+                      {Array.from(
+                        { length: count },
+                        (_, index) => index + 1,
+                      ).map((slide) => (
                         <ConsumerSlide
                           key={slide}
                           featured={slide === 1}
@@ -175,201 +163,215 @@ export function CarouselExamples({ direction }: { direction: "ltr" | "rtl" }) {
                             </Label>
                           </div>
                         </ConsumerSlide>
-                      ),
-                    )}
-                  </Carousel.Content>
-                </Carousel.Viewport>
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <Carousel.Previous
-                    className={buttonClasses}
-                    onClick={(event) => {
-                      if (cancel) event.preventDefault();
-                    }}
-                  >
-                    Previous
-                  </Carousel.Previous>
-                  <Carousel.Next
-                    ref={nextRef}
-                    disabled={disableNext}
-                    loading={loading}
-                    onClick={(event) => {
-                      if (cancel) event.preventDefault();
-                    }}
-                    style={(state) => ({
-                      cursor: state.disabled ? "not-allowed" : "pointer",
-                    })}
-                    className={buttonClasses}
-                  >
-                    Next
-                  </Carousel.Next>
-                  <Position api={api} />
-                </div>
-              </Carousel.Root>
-            )}
-            <p
-              id="carousel-project-hint"
-              className="mt-3 text-sm text-muted-foreground"
+                      ))}
+                    </Carousel.Content>
+                  </Carousel.Viewport>
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <Carousel.Previous
+                      className={buttonClasses}
+                      onClick={(event) => {
+                        if (cancel) event.preventDefault();
+                      }}
+                    >
+                      Previous
+                    </Carousel.Previous>
+                    <Carousel.Next
+                      ref={nextRef}
+                      disabled={disableNext}
+                      loading={loading}
+                      onClick={(event) => {
+                        if (cancel) event.preventDefault();
+                      }}
+                      style={(state) => ({
+                        cursor: state.disabled ? "not-allowed" : "pointer",
+                      })}
+                      className={buttonClasses}
+                    >
+                      Next
+                    </Carousel.Next>
+                    <Position api={api} />
+                  </div>
+                </Carousel.Root>
+              )}
+              <p
+                id="carousel-project-hint"
+                className="mt-3 text-sm text-muted-foreground"
+              >
+                Notes keep their arrow keys. Tab into an offscreen note to
+                reveal its slide.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-3 text-sm">
+                <Label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={loop}
+                    onChange={(event) => setLoop(event.target.checked)}
+                  />
+                  Loop
+                </Label>
+                <Label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={cancel}
+                    onChange={(event) => setCancel(event.target.checked)}
+                  />
+                  Cancel navigation
+                </Label>
+                <Label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={disableNext}
+                    onChange={(event) => setDisableNext(event.target.checked)}
+                  />
+                  Disable Next
+                </Label>
+                <Label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={loading}
+                    onChange={(event) => setLoading(event.target.checked)}
+                  />
+                  Loading Next
+                </Label>
+                <Label className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    checked={mounted}
+                    onChange={(event) => setMounted(event.target.checked)}
+                  />
+                  Mount carousel
+                </Label>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                <Button.Root
+                  className={buttonClasses}
+                  onClick={() => setCount((value) => value + 1)}
+                >
+                  Add slide
+                </Button.Root>
+                <Button.Root
+                  className={buttonClasses}
+                  disabled={!count}
+                  onClick={() => setCount((value) => Math.max(0, value - 1))}
+                >
+                  Remove slide
+                </Button.Root>
+                <Button.Root
+                  className={buttonClasses}
+                  disabled={!api}
+                  onClick={() => api?.scrollTo(0)}
+                >
+                  First via API
+                </Button.Root>
+                <Button.Root
+                  className={buttonClasses}
+                  onClick={() =>
+                    setRefStatus(
+                      [
+                        viewportRef.current?.dataset.slot,
+                        contentRef.current?.dataset.slot,
+                        nextRef.current?.dataset.slot,
+                      ].join(" / ") +
+                        `; callback mounts ${refLifecycle.current.mounts}, cleanups ${refLifecycle.current.cleanups}`,
+                    )
+                  }
+                >
+                  Inspect refs
+                </Button.Root>
+                <Button.Root type="submit" className={buttonClasses}>
+                  Submit example
+                </Button.Root>
+              </div>
+              <p className="mt-3 text-sm" aria-live="polite">
+                Refs: {refStatus}. Submissions: {submitted}.
+              </p>
+            </form>
+          </div>
+        ),
+      },
+      {
+        title: "Vertical · explicit viewport height / custom render",
+        usage:
+          '<Carousel.Root orientation="vertical">\n  <Carousel.Viewport className="h-60">\n    <Carousel.Content><Carousel.Item>Vertical slide</Carousel.Item></Carousel.Content>\n  </Carousel.Viewport>\n</Carousel.Root>',
+        preview: (
+          <div className="space-y-4">
+            <Carousel.Root
+              aria-label="Vertical carousel"
+              orientation="vertical"
+              dir={direction}
+              setApi={setVerticalApi}
             >
-              Notes keep their arrow keys. Tab into an offscreen note to reveal
-              its slide.
-            </p>
-            <div className="mt-4 flex flex-wrap gap-3 text-sm">
-              <Label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={loop}
-                  onChange={(event) => setLoop(event.target.checked)}
-                />
-                Loop
-              </Label>
-              <Label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={cancel}
-                  onChange={(event) => setCancel(event.target.checked)}
-                />
-                Cancel navigation
-              </Label>
-              <Label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={disableNext}
-                  onChange={(event) => setDisableNext(event.target.checked)}
-                />
-                Disable Next
-              </Label>
-              <Label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={loading}
-                  onChange={(event) => setLoading(event.target.checked)}
-                />
-                Loading Next
-              </Label>
-              <Label className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  checked={mounted}
-                  onChange={(event) => setMounted(event.target.checked)}
-                />
-                Mount carousel
-              </Label>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Button.Root
-                className={buttonClasses}
-                onClick={() => setCount((value) => value + 1)}
-              >
-                Add slide
-              </Button.Root>
-              <Button.Root
-                className={buttonClasses}
-                disabled={!count}
-                onClick={() => setCount((value) => Math.max(0, value - 1))}
-              >
-                Remove slide
-              </Button.Root>
-              <Button.Root
-                className={buttonClasses}
-                disabled={!api}
-                onClick={() => api?.scrollTo(0)}
-              >
-                First via API
-              </Button.Root>
-              <Button.Root
-                className={buttonClasses}
-                onClick={() =>
-                  setRefStatus(
-                    [
-                      viewportRef.current?.dataset.slot,
-                      contentRef.current?.dataset.slot,
-                      nextRef.current?.dataset.slot,
-                    ].join(" / ") +
-                      `; callback mounts ${refLifecycle.current.mounts}, cleanups ${refLifecycle.current.cleanups}`,
-                  )
-                }
-              >
-                Inspect refs
-              </Button.Root>
-              <Button.Root type="submit" className={buttonClasses}>
-                Submit example
-              </Button.Root>
-            </div>
-            <p className="mt-3 text-sm" aria-live="polite">
-              Refs: {refStatus}. Submissions: {submitted}.
-            </p>
-          </form>
-        </Example>
-        <Example title="Vertical · explicit viewport height / custom render">
-          <Carousel.Root
-            aria-label="Vertical carousel"
-            orientation="vertical"
-            dir={direction}
-            setApi={setVerticalApi}
-          >
-            <Carousel.Viewport className="h-48 rounded-lg">
-              <Carousel.Content className="gap-3">
-                {[1, 2, 3].map((slide) => (
-                  <ConsumerSlide key={slide} aria-label={`${slide} of 3`}>
-                    Vertical slide {slide}
-                  </ConsumerSlide>
-                ))}
-              </Carousel.Content>
-            </Carousel.Viewport>
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              <Carousel.Previous
-                aria-label="Previous vertical slide"
-                className={buttonClasses}
-              >
-                Up
-              </Carousel.Previous>
-              <Carousel.Next
-                aria-label="Next vertical slide"
-                render={<div />}
-                nativeButton={false}
-                className={buttonClasses}
-              >
-                Down
-              </Carousel.Next>
-              <Position api={verticalApi} />
-            </div>
-          </Carousel.Root>
-        </Example>
-        <Example title="RTL · direction option / consumer widths">
-          <Carousel.Root
-            aria-label="RTL carousel"
-            opts={{ direction: "rtl", align: "start" }}
-          >
-            <Carousel.Viewport>
-              <Carousel.Content className="gap-3">
-                {[1, 2, 3, 4].map((slide) => (
-                  <ConsumerSlide
-                    key={slide}
-                    aria-label={`${slide} of 4`}
-                    className="basis-2/3"
-                  >
-                    RTL slide {slide}
-                  </ConsumerSlide>
-                ))}
-              </Carousel.Content>
-            </Carousel.Viewport>
-            <div className="mt-3 flex gap-2">
-              <Carousel.Previous
-                aria-label="Previous RTL slide"
-                className={buttonClasses}
-              >
-                Previous
-              </Carousel.Previous>
-              <Carousel.Next
-                aria-label="Next RTL slide"
-                className={buttonClasses}
-              >
-                Next
-              </Carousel.Next>
-            </div>
-          </Carousel.Root>
-        </Example>
-      </div>
-    </section>
-  );
+              <Carousel.Viewport className="h-48 rounded-lg">
+                <Carousel.Content className="gap-3">
+                  {[1, 2, 3].map((slide) => (
+                    <ConsumerSlide key={slide} aria-label={`${slide} of 3`}>
+                      Vertical slide {slide}
+                    </ConsumerSlide>
+                  ))}
+                </Carousel.Content>
+              </Carousel.Viewport>
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <Carousel.Previous
+                  aria-label="Previous vertical slide"
+                  className={buttonClasses}
+                >
+                  Up
+                </Carousel.Previous>
+                <Carousel.Next
+                  aria-label="Next vertical slide"
+                  render={<div />}
+                  nativeButton={false}
+                  className={buttonClasses}
+                >
+                  Down
+                </Carousel.Next>
+                <Position api={verticalApi} />
+              </div>
+            </Carousel.Root>
+          </div>
+        ),
+      },
+      {
+        title: "RTL · direction option / consumer widths",
+        usage:
+          '<Carousel.Root dir="rtl" opts={{ direction: "rtl" }}>\n  <Carousel.Viewport><Carousel.Content>\n    <Carousel.Item className="basis-2/3">RTL slide</Carousel.Item>\n  </Carousel.Content></Carousel.Viewport>\n</Carousel.Root>',
+        preview: (
+          <div className="space-y-4">
+            <Carousel.Root
+              aria-label="RTL carousel"
+              opts={{ direction: "rtl", align: "start" }}
+            >
+              <Carousel.Viewport>
+                <Carousel.Content className="gap-3">
+                  {[1, 2, 3, 4].map((slide) => (
+                    <ConsumerSlide
+                      key={slide}
+                      aria-label={`${slide} of 4`}
+                      className="basis-2/3"
+                    >
+                      RTL slide {slide}
+                    </ConsumerSlide>
+                  ))}
+                </Carousel.Content>
+              </Carousel.Viewport>
+              <div className="mt-3 flex gap-2">
+                <Carousel.Previous
+                  aria-label="Previous RTL slide"
+                  className={buttonClasses}
+                >
+                  Previous
+                </Carousel.Previous>
+                <Carousel.Next
+                  aria-label="Next RTL slide"
+                  className={buttonClasses}
+                >
+                  Next
+                </Carousel.Next>
+              </div>
+            </Carousel.Root>
+          </div>
+        ),
+      },
+    ],
+  };
 }

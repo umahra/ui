@@ -3,6 +3,7 @@ import { defineConfig } from "tsdown";
 export default defineConfig({
   entry: {
     index: "src/index.ts",
+    visualiser: "src/visualiser/index.tsx",
     carousel: "src/carousel/index.ts",
     accordion: "src/accordion/index.ts",
     heading: "src/heading/index.tsx",
@@ -22,6 +23,7 @@ export default defineConfig({
     sheet: "src/sheet/index.ts",
     radio: "src/radio/index.ts",
   },
+  copy: [{ from: "src/visualiser/fonts", to: "dist/fonts" }],
   format: ["esm"],
   platform: "neutral",
   unbundle: true,

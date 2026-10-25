@@ -1,16 +1,14 @@
 import { useRef, useState } from "react";
-
 import {
   ButtonPrimitive as Button,
   type ButtonRootProps,
   ButtonGroupPrimitive as Group,
 } from "../src/button";
 import { cn } from "../src/cn";
-import { Heading } from "../src/heading";
 import { InputPrimitive } from "../src/input";
 import { LabelPrimitive } from "../src/label";
 import { PopoverPrimitive as Popover } from "../src/popover";
-import { Text } from "../src/text";
+import type { DesignSystemComponent } from "../src/visualiser";
 
 interface ActionProps extends ButtonRootProps {
   compact?: boolean;
@@ -29,36 +27,26 @@ function Action({ compact, className, ...props }: ActionProps) {
   );
 }
 
-export function ButtonGroupExamples() {
+export function useButtonGroupExamples(): DesignSystemComponent {
   const [action, setAction] = useState("No action yet");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState("");
   const rootRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  return (
-    <section
-      id="button-group"
-      aria-labelledby="button-group-title"
-      className="component-section"
-    >
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">02 / Interaction</p>
-          <Heading as="h2" id="button-group-title">
-            Button Group
-          </Heading>
-        </div>
-        <code>ButtonGroupPrimitive · /button</code>
-      </div>
-      <Text className="section-description">
-        Related actions with normal Tab navigation. Text and Separator are
-        optional; wrappers own appearance, spacing and sizes.
-      </Text>
-      <div className="examples-grid">
-        <div className="example">
-          <p className="example-label">Primitive · browser defaults</p>
-          <div className="example-body">
+  return {
+    id: "button-group",
+    name: "Button Group",
+    description: "Related actions arranged in a group.",
+    importCode:
+      'import { ButtonGroupPrimitive as Group, ButtonPrimitive as Button } from "@umahra/ui/button";',
+    examples: [
+      {
+        title: "Primitive · browser defaults",
+        usage:
+          '<Group.Root aria-label="Clipboard actions">\n  <Button.Root>Copy</Button.Root>\n  <Button.Root>Paste</Button.Root>\n</Group.Root>',
+        preview: (
+          <div className="project-preview">
             <Group.Root aria-label="Plain actions">
               <Button.Root onClick={() => setAction("Plain copy")}>
                 Copy
@@ -68,12 +56,14 @@ export function ButtonGroupExamples() {
               </Button.Root>
             </Group.Root>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">
-            Consumer wrapper · joined edges and focus
-          </p>
-          <div className="example-body">
+        ),
+      },
+      {
+        title: "Consumer wrapper · joined edges and focus",
+        usage:
+          '<Group.Root aria-label="Clipboard actions">\n  <Action onClick={copy}>Copy</Action>\n  <Action onClick={paste}>Paste</Action>\n  <Action disabled>Delete</Action>\n</Group.Root>',
+        preview: (
+          <div className="project-preview">
             <Group.Root aria-label="Clipboard actions" ref={rootRef}>
               <Action
                 onClick={() =>
@@ -101,10 +91,14 @@ export function ButtonGroupExamples() {
               {action}
             </output>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">Vertical · optional separator</p>
-          <div className="example-body">
+        ),
+      },
+      {
+        title: "Vertical · optional separator",
+        usage:
+          '<Group.Root orientation="vertical" aria-label="Zoom">\n  <Action>Zoom in</Action>\n  <Group.Separator orientation="horizontal" />\n  <Action>Zoom out</Action>\n</Group.Root>',
+        preview: (
+          <div className="project-preview">
             <Group.Root orientation="vertical" aria-label="Zoom controls">
               <Action
                 className="border-0 bg-muted"
@@ -124,10 +118,14 @@ export function ButtonGroupExamples() {
               </Action>
             </Group.Root>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">Text as label · input, forms and refs</p>
-          <div className="example-body">
+        ),
+      },
+      {
+        title: "Text as label · input, forms and refs",
+        usage:
+          '<Group.Root aria-label="Search actions">\n  <Group.Text render={<LabelPrimitive htmlFor="query" />}>Find</Group.Text>\n  <InputPrimitive id="query" name="query" />\n  <Action type="submit">Go</Action>\n</Group.Root>',
+        preview: (
+          <div className="project-preview">
             <form
               onSubmit={(event) => {
                 event.preventDefault();
@@ -160,10 +158,14 @@ export function ButtonGroupExamples() {
               </output>
             </form>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">Split action · popover and loading</p>
-          <div className="example-body">
+        ),
+      },
+      {
+        title: "Split action · popover and loading",
+        usage:
+          '<Popover.Root>\n  <Group.Root aria-label="Save actions">\n    <Action loading={loading}>Save</Action>\n    <Popover.Trigger render={<Action aria-label="More save actions" />}>⌄</Popover.Trigger>\n  </Group.Root>\n  <Popover.Portal>\n    <Popover.Positioner><Popover.Content>\n      <Popover.Title>Save options</Popover.Title>\n      <Popover.Close>Save a copy</Popover.Close>\n    </Popover.Content></Popover.Positioner>\n  </Popover.Portal>\n</Popover.Root>',
+        preview: (
+          <div className="project-preview">
             <Popover.Root>
               <Group.Root aria-label="Save actions">
                 <Action loading={loading} onClick={() => setAction("Saved")}>
@@ -207,12 +209,14 @@ export function ButtonGroupExamples() {
               Loading first action
             </LabelPrimitive>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">
-            Nested groups · consumer spacing and sizes
-          </p>
-          <div className="example-body">
+        ),
+      },
+      {
+        title: "Nested groups · consumer spacing and sizes",
+        usage:
+          '<Group.Root aria-label="History and formatting" className="flex-wrap gap-3">\n  <Group.Root aria-label="History"><Action compact>Undo</Action><Action compact>Redo</Action></Group.Root>\n  <Group.Root aria-label="Formatting"><Action compact>Bold</Action></Group.Root>\n</Group.Root>',
+        preview: (
+          <div className="project-preview">
             <Group.Root
               aria-label="History and formatting"
               className="flex-wrap gap-3"
@@ -235,8 +239,8 @@ export function ButtonGroupExamples() {
               </Group.Root>
             </Group.Root>
           </div>
-        </div>
-      </div>
-    </section>
-  );
+        ),
+      },
+    ],
+  };
 }
