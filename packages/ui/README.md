@@ -4,8 +4,8 @@ Umahra UI is a public UI library for building websites, using the theme conventi
 of [shadcn/ui](https://ui.shadcn.com). You can use shadcn components alongside Umahra
 UI and customize them with the same project-owned theme CSS.
 
-The library currently provides a component-free foundation with TypeScript
-declarations. Components will be added separately.
+The library provides composable UI primitives and an optional DesignSystem page
+for documenting your theme and components.
 
 ## Why?
 
@@ -32,24 +32,29 @@ global stylesheet and font loading.
 
 ## Installation
 
+### 1. Install the package
+
 Install `@umahra/ui` with:
 
 ```sh
 pnpm add @umahra/ui
 ```
 
-## Configure styles
+### 2. Configure styles
 
-Copy the stylesheet below into your project's global CSS file. Replace your existing Tailwind import with this setup to avoid duplicate imports.
+Copy this single template into your project's global CSS file and load it once
+from your application entry or root layout. It includes the theme colors, radii,
+body and heading typography, responsive values, and base styles.
 
-These global styles provide the theme variables, semantic utilities, and base styles
-used by Umahra UI and shadcn components. Your application must load them; `@umahra/ui`
-does not import a stylesheet for you.
+Adjust the `@source` path relative to this CSS file. Tailwind uses it to scan the
+installed package and generate styles for its classes, including DesignSystem.
+The package ships no stylesheet.
 
 ```css
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@source "../node_modules/@umahra/ui/dist";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -164,6 +169,57 @@ does not import a stylesheet for you.
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+@theme {
+  --text-body: 1rem;
+  --text-body--line-height: 1.5;
+  --text-body--font-weight: 400;
+  --text-body--letter-spacing: 0em;
+
+  --text-h1: 2.25rem;
+  --text-h1--line-height: 1.2;
+  --text-h1--font-weight: 600;
+  --text-h1--letter-spacing: -0.02em;
+
+  --text-h2: 1.75rem;
+  --text-h2--line-height: 1.25;
+  --text-h2--font-weight: 600;
+  --text-h2--letter-spacing: -0.015em;
+
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.4;
+  --text-h3--font-weight: 600;
+  --text-h3--letter-spacing: -0.01em;
+
+  --text-h4: 1.25rem;
+  --text-h4--line-height: 1.4;
+  --text-h4--font-weight: 600;
+  --text-h4--letter-spacing: -0.01em;
+
+  --text-h5: 1.125rem;
+  --text-h5--line-height: 1.4;
+  --text-h5--font-weight: 600;
+  --text-h5--letter-spacing: 0em;
+
+  --text-h6: 1rem;
+  --text-h6--line-height: 1.5;
+  --text-h6--font-weight: 600;
+  --text-h6--letter-spacing: 0em;
+}
+
+:root {
+  @variant sm {
+    --text-h1: 3rem;
+    --text-h1--line-height: 1.1;
+    --text-h1--letter-spacing: -0.025em;
+    --text-h2: 2.25rem;
+    --text-h2--line-height: 1.2;
+    --text-h2--letter-spacing: -0.02em;
+    --text-h3: 1.75rem;
+    --text-h3--line-height: 1.25;
+    --text-h3--letter-spacing: -0.015em;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -174,40 +230,100 @@ does not import a stylesheet for you.
 }
 ```
 
-## Theme and font ownership
+Customize the values in this template for your project. Add `class="dark"` to the
+`html` element to use the dark palette. Use semantic utilities such as
+`bg-primary text-primary-foreground` and ordinary Tailwind spacing utilities.
+The `rounded-*` values derive from `--radius`.
 
-Set `class="dark"` on your document's `html` element to select the dark palette; remove
-it for the light palette. The `dark:` variant applies to descendants of `.dark`.
-Use semantic utilities such as `bg-primary text-primary-foreground`, `border-border`,
-and `bg-background text-foreground`.
+Heading uses `text-h1` through `text-h6`; Text uses `text-body`. Both inherit font
+family. Choose families with `font-sans`, `font-serif`, or `font-mono`, and load
+fonts in your application with a framework loader, `@font-face`, or a font package.
+DesignSystem loads a separate font for its documentation; previews use your fonts.
 
-Override existing variables after the recipe in the same selectors. For example:
+You own this CSS template. Package upgrades do not overwrite it. See
+[Tailwind theme variables](https://tailwindcss.com/docs/theme) and
+[shadcn theming](https://ui.shadcn.com/docs/theming) for customization.
 
-```css
-:root {
-  --primary: oklch(0.45 0.12 250);
-  --primary-foreground: oklch(0.985 0 0);
-  --radius: 0.75rem;
-}
+### 3. Design System
 
-.dark {
-  --primary: oklch(0.8 0.1 250);
-  --primary-foreground: oklch(0.145 0 0);
+Render `DesignSystem` on a dedicated page after loading your global CSS above.
+It displays your theme's **Colors** and **Fonts & Typography** automatically.
+Pass a `components` array to add the components you want to document.
+
+This complete page adds a Button section with a working preview and its code:
+
+```tsx
+"use client";
+
+import { ButtonPrimitive as Button } from "@umahra/ui/button";
+import { DesignSystem, type DesignSystemComponent } from "@umahra/ui/visualiser";
+
+const components = [
+  {
+    id: "button",
+    name: "Button",
+    description: "Buttons trigger actions.",
+    importCode: 'import { ButtonPrimitive as Button } from "@umahra/ui/button";',
+    examples: [
+      {
+        title: "Primary",
+        usage: `<Button.Root className="rounded-md bg-primary px-4 py-2 text-primary-foreground">
+  Continue
+</Button.Root>`,
+        preview: (
+          <Button.Root className="rounded-md bg-primary px-4 py-2 text-primary-foreground">
+            Continue
+          </Button.Root>
+        ),
+      },
+    ],
+  },
+] satisfies DesignSystemComponent[];
+
+export default function DesignSystemPage() {
+  return <DesignSystem components={components} />;
 }
 ```
 
-The `rounded-sm` through `rounded-4xl` utilities derive from `--radius` using the
-upstream recipe. Use Tailwind's ordinary spacing utilities such as `p-4` and `gap-4`;
-there is no additional spacing system.
+Each entry in `components` becomes a navigation section:
 
-Choose and load fonts in your application with your framework's loader, a local
-`@font-face`, or a project font stack. The package and recipe load no fonts.
-See [Tailwind theme variables](https://tailwindcss.com/docs/theme) and
-[shadcn theming](https://ui.shadcn.com/docs/theming) for project customization.
+- `id` is its unique lowercase URL anchor; `name` and `description` label the section.
+- `importCode` is an optional import snippet displayed above its examples.
+- `examples` contains a unique `title`, the `preview` JSX to render, and the `usage`
+  string to show in the Code tab. Keep the string in sync with the preview.
 
-Your copied CSS is project-owned: later README or package upgrades do not automatically
-replace it. Review and apply recipe changes deliberately. Published package fixes reach
-projects through explicit dependency upgrades.
+Add more examples to the same component or more entries to `components`.
+For interactive examples, keep state and handlers in your page or preview
+components. Previews stay mounted when switching between Preview and Code.
+In Next.js App Router, keep this composition in a client component, as above.
+
+#### Custom colors and typography
+
+The built-in foundations inspect the standard theme variables and Heading/Text
+styles. To include additional project styles, pass `colors` and `typography`:
+
+```tsx
+<DesignSystem
+  components={components}
+  colors={[{ name: "Brand", variable: "--brand" }]}
+  typography={[
+    { name: "Display", className: "font-serif text-4xl font-semibold leading-tight" },
+  ]}
+/>
+```
+
+Here, `--brand` must already be defined in your global CSS template. A custom
+color entry names a CSS variable; a typography entry supplies the classes to
+render. These arrays append to the built-in foundations.
+
+Colors display and copy their CSS values. Typography displays the computed font
+family stack, size, weight, and line height, including responsive classes and
+inherited styles. Measurements refresh when the theme, styles, fonts, or viewport
+change. The family stack does not identify which font renders each glyph.
+
+DesignSystem supplies the page header and navigation. It uses your theme
+background, respects inherited direction and theme classes, and keeps component
+previews styled by your project. No additional stylesheet import is needed.
 
 ## Contributing
 

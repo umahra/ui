@@ -1,10 +1,9 @@
 import { useState } from "react";
-
 import { ButtonPrimitive as Button } from "../src/button";
-import { Heading } from "../src/heading";
 import { InputGroupPrimitive as Group } from "../src/input";
 import { LabelPrimitive } from "../src/label";
 import { Text } from "../src/text";
+import type { DesignSystemComponent } from "../src/visualiser";
 
 const groupClasses =
   "rounded-md border border-input bg-background focus-within:ring-2 focus-within:ring-ring/50 has-aria-invalid:border-destructive has-[[data-slot=input-group-control]:focus-visible]:outline-hidden";
@@ -13,7 +12,7 @@ const controlClasses =
 const actionClasses =
   "rounded border border-input px-2 py-1 text-xs focus-visible:outline-2 focus-visible:outline-ring data-disabled:opacity-50";
 
-export function InputGroupExamples() {
+export function useInputGroupExamples(): DesignSystemComponent {
   const [query, setQuery] = useState("");
   const [message, setMessage] = useState("");
   const [action, setAction] = useState("No action yet.");
@@ -23,32 +22,19 @@ export function InputGroupExamples() {
   const [addonClicks, setAddonClicks] = useState(0);
   const [loading, setLoading] = useState(false);
 
-  return (
-    <section
-      id="input-group"
-      aria-labelledby="input-group-title"
-      className="component-section"
-    >
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">04 / Composition</p>
-          <Heading as="h2" id="input-group-title">
-            Input Group
-          </Heading>
-        </div>
-        <code>InputGroupPrimitive</code>
-      </div>
-      <Text className="section-description">
-        Compose an input or textarea with optional text, actions, and addons.
-        Keep the control first in the DOM; addon alignment sets its visual
-        position.
-      </Text>
-      <div className="examples-grid">
-        <div className="example">
-          <p className="example-label">
-            Primitive · optional prefix and suffix
-          </p>
-          <div className="example-body space-y-3">
+  return {
+    id: "input-group",
+    name: "Input Group",
+    description: "Inputs with supporting text, icons and actions.",
+    importCode:
+      'import { InputGroupPrimitive as Group } from "@umahra/ui/input";',
+    examples: [
+      {
+        title: "Primitive · optional prefix and suffix",
+        usage:
+          '<Group.Root>\n  <Group.Input aria-label="Website" />\n  <Group.Addon><Group.Text>https://</Group.Text></Group.Addon>\n  <Group.Addon align="inline-end"><Group.Text>.com</Group.Text></Group.Addon>\n</Group.Root>',
+        preview: (
+          <div className="project-preview space-y-3">
             <LabelPrimitive htmlFor="group-url" className="block text-sm">
               Website
             </LabelPrimitive>
@@ -72,10 +58,14 @@ export function InputGroupExamples() {
               />
             </Group.Root>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">Consumer wrapper · search and actions</p>
-          <div className="example-body space-y-3">
+        ),
+      },
+      {
+        title: "Consumer wrapper · search and actions",
+        usage:
+          '<Group.Root>\n  <Group.Input aria-label="Search" value={query} onValueChange={setQuery} />\n  <Group.Addon align="inline-end"><Group.Button type="submit">Search</Group.Button></Group.Addon>\n</Group.Root>',
+        preview: (
+          <div className="project-preview space-y-3">
             <form
               className="space-y-3"
               onSubmit={(event) => {
@@ -175,10 +165,14 @@ export function InputGroupExamples() {
               {action} Addon clicks: {addonClicks}.
             </Text>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">Block-start · header and textarea</p>
-          <div className="example-body space-y-3">
+        ),
+      },
+      {
+        title: "Block-start · header and textarea",
+        usage:
+          '<Group.Root>\n  <Group.Addon align="block-start"><Group.Text>Notes</Group.Text></Group.Addon>\n  <Group.Textarea aria-label="Notes" />\n</Group.Root>',
+        preview: (
+          <div className="project-preview space-y-3">
             <LabelPrimitive htmlFor="group-notes" className="block text-sm">
               Project notes
             </LabelPrimitive>
@@ -210,12 +204,14 @@ export function InputGroupExamples() {
               </Group.Addon>
             </Group.Root>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">
-            Block-end · message and optional loading
-          </p>
-          <div className="example-body space-y-3">
+        ),
+      },
+      {
+        title: "Block-end · message and optional loading",
+        usage:
+          '<Group.Root>\n  <Group.Textarea aria-label="Message" />\n  <Group.Addon align="block-end">\n    <Group.Text>Ready to send</Group.Text>\n    <Group.Button loading={loading}>Send</Group.Button>\n  </Group.Addon>\n</Group.Root>',
+        preview: (
+          <div className="project-preview space-y-3">
             <LabelPrimitive htmlFor="group-message" className="block text-sm">
               Message
             </LabelPrimitive>
@@ -252,8 +248,8 @@ export function InputGroupExamples() {
               Loading group action
             </LabelPrimitive>
           </div>
-        </div>
-      </div>
-    </section>
-  );
+        ),
+      },
+    ],
+  };
 }

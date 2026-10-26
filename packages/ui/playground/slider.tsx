@@ -1,10 +1,7 @@
-import { DirectionProvider } from "@base-ui/react/direction-provider";
 import { Field as BaseField } from "@base-ui/react/field";
-import { type ReactNode, useRef, useState } from "react";
-
+import { useRef, useState } from "react";
 import { ButtonPrimitive as Button } from "../src/button";
 import { cn } from "../src/cn";
-import { Heading } from "../src/heading";
 import { LabelPrimitive } from "../src/label";
 import {
   SliderPrimitive as Slider,
@@ -12,6 +9,7 @@ import {
   type SliderThumbProps,
 } from "../src/slider";
 import { Text } from "../src/text";
+import type { DesignSystemComponent } from "../src/visualiser";
 
 const buttonClasses =
   "rounded-md border border-input px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-ring";
@@ -67,16 +65,7 @@ function ConsumerSlider<Value extends number | readonly number[]>({
   );
 }
 
-function Example({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="example">
-      <p className="example-label">{title}</p>
-      <div className="example-body space-y-4">{children}</div>
-    </div>
-  );
-}
-
-export function SliderExamples({ direction }: { direction: "ltr" | "rtl" }) {
+export function useSliderExamples(): DesignSystemComponent {
   const [value, setValue] = useState(40);
   const [cancel, setCancel] = useState(false);
   const [change, setChange] = useState("No change yet.");
@@ -91,29 +80,19 @@ export function SliderExamples({ direction }: { direction: "ltr" | "rtl" }) {
   const thumbRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  return (
-    <DirectionProvider direction={direction}>
-      <section
-        id="slider"
-        aria-labelledby="slider-title"
-        className="component-section"
-      >
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">11 / Forms</p>
-            <Heading as="h2" id="slider-title">
-              Slider
-            </Heading>
-          </div>
-          <code>SliderPrimitive</code>
-        </div>
-        <Text className="section-description">
-          Compose single, range and multiple thumbs. Consumers own dimensions,
-          spacing and appearance. Try keyboard arrows, Home/End, Page Up/Down,
-          dragging, RTL and the narrow canvas.
-        </Text>
-        <div className="examples-grid">
-          <Example title="Primitive · external geometry only">
+  return {
+    id: "slider",
+    name: "Slider",
+    description: "A control for selecting a value or range.",
+    importCode:
+      'import { SliderPrimitive as Slider } from "@umahra/ui/slider";',
+    examples: [
+      {
+        title: "Primitive · external geometry only",
+        usage:
+          '<Slider.Root defaultValue={40} aria-label="Volume">\n  <Slider.Control className="h-6 w-full">\n    <Slider.Track className="h-1 bg-muted"><Slider.Indicator className="bg-primary" /></Slider.Track>\n    <Slider.Thumb className="size-4 rounded-full bg-primary" />\n  </Slider.Control>\n</Slider.Root>',
+        preview: (
+          <div className="space-y-4">
             <Slider.Root defaultValue={30}>
               <Slider.Label>Primitive level</Slider.Label>
               <Slider.Value />
@@ -128,8 +107,15 @@ export function SliderExamples({ direction }: { direction: "ltr" | "rtl" }) {
               Only this example supplies a control height, track line and text
               thumb. Tab to see the primitive's focus fallback.
             </Text>
-          </Example>
-          <Example title="Consumer wrapper · controlled, events and cancellation">
+          </div>
+        ),
+      },
+      {
+        title: "Consumer wrapper · controlled, events and cancellation",
+        usage:
+          "<Slider.Root value={value} onValueChange={onValueChange} onValueCommitted={onCommit}>\n  <Slider.Label>Volume</Slider.Label><Slider.Value />\n  <Slider.Control><Slider.Track><Slider.Indicator /></Slider.Track><Slider.Thumb /></Slider.Control>\n</Slider.Root>",
+        preview: (
+          <div className="space-y-4">
             <ConsumerSlider
               label="Volume"
               value={value}
@@ -157,8 +143,15 @@ export function SliderExamples({ direction }: { direction: "ltr" | "rtl" }) {
               <br />
               Commit: {commit}
             </p>
-          </Example>
-          <Example title="Range · distinct names, minimum distance and collisions">
+          </div>
+        ),
+      },
+      {
+        title: "Range · distinct names, minimum distance and collisions",
+        usage:
+          '<Slider.Root defaultValue={[20, 80]} minStepsBetweenValues={10}>\n  <Slider.Control><Slider.Track><Slider.Indicator /></Slider.Track>\n    <Slider.Thumb index={0} aria-label="Minimum" />\n    <Slider.Thumb index={1} aria-label="Maximum" />\n  </Slider.Control>\n</Slider.Root>',
+        preview: (
+          <div className="space-y-4">
             <ConsumerSlider
               key={collision}
               label="Price range"
@@ -188,8 +181,15 @@ export function SliderExamples({ direction }: { direction: "ltr" | "rtl" }) {
                 <option value="none">Stop</option>
               </select>
             </LabelPrimitive>
-          </Example>
-          <Example title="Multiple thumbs · explicit indexes and custom value output">
+          </div>
+        ),
+      },
+      {
+        title: "Multiple thumbs · explicit indexes and custom value output",
+        usage:
+          '<Slider.Root defaultValue={[20, 50, 80]}>\n  <Slider.Value>{values => values.join(" / ")}</Slider.Value>\n  <Slider.Control><Slider.Track />\n    <Slider.Thumb index={0} aria-label="First" /><Slider.Thumb index={1} aria-label="Second" />\n    <Slider.Thumb index={2} aria-label="Third" />\n  </Slider.Control>\n</Slider.Root>',
+        preview: (
+          <div className="space-y-4">
             <Slider.Root defaultValue={[15, 45, 85]} className="space-y-2">
               <Slider.Label className="text-sm">Breakpoints</Slider.Label>
               <Slider.Value className="block text-sm tabular-nums">
@@ -218,8 +218,15 @@ export function SliderExamples({ direction }: { direction: "ltr" | "rtl" }) {
               defaultValue={65}
               compact
             />
-          </Example>
-          <Example title="Vertical · discrete steps, scalar value and centered alignment">
+          </div>
+        ),
+      },
+      {
+        title: "Vertical · discrete steps, scalar value and centered alignment",
+        usage:
+          '<Slider.Root orientation="vertical" defaultValue={30} step={10}>\n  <Slider.Label>Level</Slider.Label>\n  <Slider.Control className="h-40 w-6"><Slider.Track className="w-1" /><Slider.Thumb /></Slider.Control>\n</Slider.Root>',
+        preview: (
+          <div className="space-y-4">
             <div className="h-64">
               <Slider.Root
                 orientation="vertical"
@@ -241,8 +248,15 @@ export function SliderExamples({ direction }: { direction: "ltr" | "rtl" }) {
                 </Slider.Control>
               </Slider.Root>
             </div>
-          </Example>
-          <Example title="Disabled and optional Base UI validation context">
+          </div>
+        ),
+      },
+      {
+        title: "Disabled and optional Base UI validation context",
+        usage:
+          "<Field.Root>\n  <Field.Label>Disabled level</Field.Label>\n  <Slider.Root disabled defaultValue={40}>\n    <Slider.Control><Slider.Track /><Slider.Thumb /></Slider.Control>\n  </Slider.Root>\n</Field.Root>",
+        preview: (
+          <div className="space-y-4">
             <ConsumerSlider label="Disabled level" defaultValue={60} disabled />
             <BaseField.Root invalid>
               <ConsumerSlider
@@ -261,8 +275,15 @@ export function SliderExamples({ direction }: { direction: "ltr" | "rtl" }) {
                 Choose a level below 80.
               </BaseField.Description>
             </BaseField.Root>
-          </Example>
-          <Example title="Optional companions · no label, output or filled indicator">
+          </div>
+        ),
+      },
+      {
+        title: "Optional companions · no label, output or filled indicator",
+        usage:
+          '<Slider.Root defaultValue={40}>\n  <Slider.Control><Slider.Track /><Slider.Thumb aria-label="Level" /></Slider.Control>\n</Slider.Root>',
+        preview: (
+          <div className="space-y-4">
             <Slider.Root defaultValue={25}>
               <Slider.Control className="h-10">
                 <Slider.Track className="h-1 rounded-full bg-muted" />
@@ -276,8 +297,16 @@ export function SliderExamples({ direction }: { direction: "ltr" | "rtl" }) {
             <Text className="text-sm text-muted-foreground">
               An accessible thumb name replaces the visible label.
             </Text>
-          </Example>
-          <Example title="Native form · refs, render/style composition and consumer reset">
+          </div>
+        ),
+      },
+      {
+        title:
+          "Native form · refs, render/style composition and consumer reset",
+        usage:
+          '<form onSubmit={onSubmit} onReset={onReset}>\n  <Slider.Root name="level" defaultValue={40} ref={rootRef}>\n    <Slider.Control><Slider.Track /><Slider.Thumb inputRef={inputRef} aria-label="Level" /></Slider.Control>\n  </Slider.Root>\n  <Button.Root type="submit">Submit</Button.Root><Button.Root type="reset">Reset</Button.Root>\n</form>',
+        preview: (
+          <div className="space-y-4">
             <form
               className="space-y-4"
               onReset={() => setResetKey((key) => key + 1)}
@@ -349,9 +378,9 @@ export function SliderExamples({ direction }: { direction: "ltr" | "rtl" }) {
                 {refs}
               </p>
             </form>
-          </Example>
-        </div>
-      </section>
-    </DirectionProvider>
-  );
+          </div>
+        ),
+      },
+    ],
+  };
 }

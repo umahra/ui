@@ -1,12 +1,11 @@
 import { cn } from "cn";
 import { type ComponentPropsWithRef, useRef, useState } from "react";
-
 import {
   BreadcrumbPrimitive as Breadcrumb,
   type BreadcrumbLinkProps,
   type BreadcrumbListProps,
 } from "../src/breadcrumb";
-import { Heading } from "../src/heading";
+import type { DesignSystemComponent } from "../src/visualiser";
 
 function ConsumerList({ className, ...props }: BreadcrumbListProps) {
   return (
@@ -33,40 +32,30 @@ function RouterLink(props: ComponentPropsWithRef<"a">) {
   return <a {...props} data-router-link="" />;
 }
 
-export function BreadcrumbExamples() {
+export function useBreadcrumbExamples(): DesignSystemComponent {
   const [expanded, setExpanded] = useState(false);
   const [events, setEvents] = useState("No composed link events yet.");
   const [routerClicks, setRouterClicks] = useState(0);
   const linkRef = useRef<HTMLAnchorElement>(null);
   const renderRef = useRef<HTMLAnchorElement>(null);
 
-  return (
-    <section
-      id="breadcrumb"
-      aria-labelledby="breadcrumb-title"
-      className="component-section"
-    >
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">18 / Navigation</p>
-          <Heading as="h2" id="breadcrumb-title">
-            Breadcrumb
-          </Heading>
-        </div>
-        <code>BreadcrumbPrimitive</code>
-      </div>
-      <p className="section-description">
-        Native navigation and current-page semantics, optional decorative parts,
-        and consumer-owned links, spacing and collapsed routes.
-      </p>
-      <div className="examples-grid">
-        <div className="example">
-          <p className="example-label">Primitive · structural styles only</p>
-          <div className="example-body space-y-4">
+  return {
+    id: "breadcrumb",
+    name: "Breadcrumb",
+    description: "A trail showing the current location within a hierarchy.",
+    importCode:
+      'import { BreadcrumbPrimitive as Breadcrumb } from "@umahra/ui/breadcrumb";',
+    examples: [
+      {
+        title: "Primitive · structural styles only",
+        usage:
+          '<Breadcrumb.Root aria-label="Breadcrumb">\n  <Breadcrumb.List>\n    <Breadcrumb.Item><Breadcrumb.Link href="/">Home</Breadcrumb.Link></Breadcrumb.Item>\n    <Breadcrumb.Separator>/</Breadcrumb.Separator>\n    <Breadcrumb.Item><Breadcrumb.Page>Current page</Breadcrumb.Page></Breadcrumb.Item>\n  </Breadcrumb.List>\n</Breadcrumb.Root>',
+        preview: (
+          <div className="project-preview space-y-4">
             <Breadcrumb.Root>
               <Breadcrumb.List>
                 <Breadcrumb.Item>
-                  <Breadcrumb.Link href="#top">Home</Breadcrumb.Link>
+                  <Breadcrumb.Link href="#overview">Home</Breadcrumb.Link>
                 </Breadcrumb.Item>
                 <Breadcrumb.Separator>/</Breadcrumb.Separator>
                 <Breadcrumb.Item>
@@ -88,10 +77,14 @@ export function BreadcrumbExamples() {
               </Breadcrumb.List>
             </Breadcrumb.Root>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">Consumer wrapper · router composition</p>
-          <div className="example-body space-y-4">
+        ),
+      },
+      {
+        title: "Consumer wrapper · router composition",
+        usage:
+          '<Breadcrumb.Link render={<RouterLink to="/projects" />}>Projects</Breadcrumb.Link>',
+        preview: (
+          <div className="project-preview space-y-4">
             <Breadcrumb.Root aria-label="Router breadcrumb">
               <ConsumerList>
                 <Breadcrumb.Item>
@@ -139,12 +132,14 @@ export function BreadcrumbExamples() {
               {events} Router clicks: {routerClicks}
             </output>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">
-            Consumer wrapper · long labels and RTL
-          </p>
-          <div className="example-body">
+        ),
+      },
+      {
+        title: "Consumer wrapper · long labels and RTL",
+        usage:
+          '<Breadcrumb.List className="flex-wrap gap-2">\n  <Breadcrumb.Item className="min-w-0 break-words">\n    <Breadcrumb.Page>A long current page name</Breadcrumb.Page>\n  </Breadcrumb.Item>\n</Breadcrumb.List>',
+        preview: (
+          <div className="project-preview">
             <Breadcrumb.Root aria-label="Long breadcrumb">
               <ConsumerList className="gap-x-3 gap-y-2">
                 <Breadcrumb.Item>
@@ -169,12 +164,14 @@ export function BreadcrumbExamples() {
               </ConsumerList>
             </Breadcrumb.Root>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">
-            Consumer wrapper · optional disclosure
-          </p>
-          <div className="example-body">
+        ),
+      },
+      {
+        title: "Consumer wrapper · optional disclosure",
+        usage:
+          '<Breadcrumb.Item>\n  <Button.Root aria-expanded={expanded} onClick={toggle}>\n    <Breadcrumb.Ellipsis />\n    <span className="sr-only">Show hidden routes</span>\n  </Button.Root>\n</Breadcrumb.Item>',
+        preview: (
+          <div className="project-preview">
             <Breadcrumb.Root aria-label="Collapsed breadcrumb">
               <ConsumerList>
                 <Breadcrumb.Item>
@@ -217,8 +214,8 @@ export function BreadcrumbExamples() {
               </ConsumerList>
             </Breadcrumb.Root>
           </div>
-        </div>
-      </div>
-    </section>
-  );
+        ),
+      },
+    ],
+  };
 }

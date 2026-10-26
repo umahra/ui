@@ -6,7 +6,7 @@ import { Playground } from "./app";
 import "./globals.css";
 
 const root = document.getElementById("root");
-if (!root) throw new Error("Playground root element is missing.");
+if (!root) throw new Error("Visualiser root element is missing.");
 createRoot(root).render(
   <StrictMode>
     <Playground />

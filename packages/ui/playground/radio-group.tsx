@@ -1,17 +1,15 @@
-import { DirectionProvider } from "@base-ui/react/direction-provider";
 import { Field as BaseField } from "@base-ui/react/field";
-import { type ReactNode, useRef, useState } from "react";
-
+import { useRef, useState } from "react";
 import { ButtonPrimitive as Button } from "../src/button";
 import { cn } from "../src/cn";
 import { FieldPrimitive as Field } from "../src/field";
-import { Heading } from "../src/heading";
 import { LabelPrimitive as Label } from "../src/label";
 import {
   RadioGroupPrimitive as RadioGroup,
   type RadioGroupItemProps,
 } from "../src/radio";
 import { Text } from "../src/text";
+import type { DesignSystemComponent } from "../src/visualiser";
 
 const radioClasses =
   "size-5 rounded-full border border-input data-checked:border-primary data-disabled:opacity-50 aria-invalid:border-destructive focus-visible:outline-ring";
@@ -40,20 +38,7 @@ function Radio({ compact, className, ...props }: ConsumerRadioProps) {
   );
 }
 
-function Example({ title, children }: { title: string; children: ReactNode }) {
-  return (
-    <div className="example">
-      <p className="example-label">{title}</p>
-      <div className="example-body space-y-4">{children}</div>
-    </div>
-  );
-}
-
-export function RadioGroupExamples({
-  direction,
-}: {
-  direction: "ltr" | "rtl";
-}) {
+export function useRadioGroupExamples(): DesignSystemComponent {
   const [value, setValue] = useState(1);
   const [cancel, setCancel] = useState(false);
   const [disabled, setDisabled] = useState(false);
@@ -69,35 +54,26 @@ export function RadioGroupExamples({
   const itemRef = useRef<HTMLSpanElement>(null);
   const indicatorRef = useRef<HTMLSpanElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  return (
-    <DirectionProvider direction={direction}>
-      <section
-        id="radio-group"
-        aria-labelledby="radio-group-title"
-        className="component-section"
-      >
-        <div className="section-heading">
-          <div>
-            <p className="eyebrow">11 / Selection</p>
-            <Heading as="h2" id="radio-group-title">
-              Radio Group
-            </Heading>
-          </div>
-          <code>RadioGroupPrimitive</code>
-        </div>
-        <Text className="section-description">
-          Root coordinates selection. Compose Item with an optional Indicator.
-          Consumers own spacing, sizes, graphics and appearance.
-        </Text>
-        <div className="examples-grid">
-          <Example title="Primitive · optional and custom indicators">
+  return {
+    id: "radio-group",
+    name: "Radio Group",
+    description: "A set of options with a single selection.",
+    importCode:
+      'import { RadioGroupPrimitive as RadioGroup } from "@umahra/ui/radio";',
+    examples: [
+      {
+        title: "Primitive · optional and custom indicators",
+        usage:
+          '<RadioGroup.Root aria-label="Format" defaultValue="text">\n  <RadioGroup.Item value="text"><RadioGroup.Indicator />Text</RadioGroup.Item>\n  <RadioGroup.Item value="html">HTML</RadioGroup.Item>\n</RadioGroup.Root>',
+        preview: (
+          <div className="space-y-4">
             <RadioGroup.Root
               aria-label="Primitive radio choices"
               defaultValue="text"
             >
               <Label className="gap-2">
-                <RadioGroup.Item value="text">Text item</RadioGroup.Item>Without
-                Indicator
+                <RadioGroup.Item value="text">Text item</RadioGroup.Item>
+                Without Indicator
               </Label>
               <Label className="gap-2">
                 <RadioGroup.Item value="custom">
@@ -112,8 +88,15 @@ export function RadioGroupExamples({
               Tab into the group, use arrow keys and Space. The retained
               indicator is invisible while unchecked.
             </Text>
-          </Example>
-          <Example title="Consumer wrapper · typed values, state and cancellation">
+          </div>
+        ),
+      },
+      {
+        title: "Consumer wrapper · typed values, state and cancellation",
+        usage:
+          '<RadioGroup.Root value={value} onValueChange={onValueChange} aria-label="Plan">\n  <RadioGroup.Item value="basic"><RadioGroup.Indicator />Basic</RadioGroup.Item>\n  <RadioGroup.Item value="pro" disabled>Pro</RadioGroup.Item>\n</RadioGroup.Root>',
+        preview: (
+          <div className="space-y-4">
             <Field.Set className="gap-3" data-invalid={invalid || undefined}>
               <Field.Legend id="radio-number-label">Priority</Field.Legend>
               <Field.Description
@@ -151,7 +134,9 @@ export function RadioGroupExamples({
                       ref={number === 1 ? itemRef : undefined}
                       inputRef={number === 1 ? inputRef : undefined}
                       className={radioClasses}
-                      style={(state) => ({ opacity: state.disabled ? 0.4 : 1 })}
+                      style={(state) => ({
+                        opacity: state.disabled ? 0.4 : 1,
+                      })}
                       render={(props, state) => (
                         <span
                           {...props}
@@ -232,8 +217,15 @@ export function RadioGroupExamples({
             <p className="text-sm" aria-live="polite">
               {refs}
             </p>
-          </Example>
-          <Example title="Choice cards · wrapping labels and descriptions">
+          </div>
+        ),
+      },
+      {
+        title: "Choice cards · wrapping labels and descriptions",
+        usage:
+          '<LabelPrimitive>\n  <RadioGroup.Item value="annual"><RadioGroup.Indicator /></RadioGroup.Item>\n  Annual billing\n</LabelPrimitive>',
+        preview: (
+          <div className="space-y-4">
             <Field.Set className="gap-3">
               <Field.Legend id="radio-plan-label">Subscription</Field.Legend>
               <RadioGroup.Root
@@ -269,8 +261,15 @@ export function RadioGroupExamples({
                 ))}
               </RadioGroup.Root>
             </Field.Set>
-          </Example>
-          <Example title="Native forms · required, submit and consumer reset">
+          </div>
+        ),
+      },
+      {
+        title: "Native forms · required, submit and consumer reset",
+        usage:
+          '<form onSubmit={onSubmit} onReset={onReset}>\n  <RadioGroup.Root name="plan" required aria-label="Plan">\n    <RadioGroup.Item value="basic">Basic</RadioGroup.Item>\n  </RadioGroup.Root>\n  <Button.Root type="submit">Submit</Button.Root>\n  <Button.Root type="reset">Reset</Button.Root>\n</form>',
+        preview: (
+          <div className="space-y-4">
             <form
               id="radio-example-form"
               className="space-y-4"
@@ -363,8 +362,15 @@ export function RadioGroupExamples({
             <p className="break-all text-sm" aria-live="polite">
               {submitted}
             </p>
-          </Example>
-          <Example title="Base UI Field · optional validation context">
+          </div>
+        ),
+      },
+      {
+        title: "Base UI Field · optional validation context",
+        usage:
+          '<BaseField.Root name="plan">\n  <BaseField.Label>Plan</BaseField.Label>\n  <RadioGroup.Root required><RadioGroup.Item value="basic">Basic</RadioGroup.Item></RadioGroup.Root>\n  <BaseField.Error />\n</BaseField.Root>',
+        preview: (
+          <div className="space-y-4">
             <BaseField.Root invalid name="contact" className="grid gap-3">
               <BaseField.Label>Contact preference</BaseField.Label>
               <BaseField.Description>
@@ -388,9 +394,9 @@ export function RadioGroupExamples({
                 Confirm your contact preference.
               </BaseField.Error>
             </BaseField.Root>
-          </Example>
-        </div>
-      </section>
-    </DirectionProvider>
-  );
+          </div>
+        ),
+      },
+    ],
+  };
 }

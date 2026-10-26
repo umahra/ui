@@ -1,53 +1,45 @@
 import { useRef, useState } from "react";
-
 import { ButtonPrimitive as Button } from "../src/button";
-import { Heading } from "../src/heading";
 import { InputPrimitive } from "../src/input";
 import { LabelPrimitive } from "../src/label";
 import { Text } from "../src/text";
 import { TextareaPrimitive } from "../src/textarea";
+import type { DesignSystemComponent } from "../src/visualiser";
 
 const controlClasses =
   "rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive";
 const buttonClasses =
   "rounded border border-input px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-ring";
 
-export function LabelExamples() {
+export function useLabelExamples(): DesignSystemComponent {
   const [checked, setChecked] = useState(false);
 
-  return (
-    <section
-      id="label"
-      aria-labelledby="label-title"
-      className="component-section"
-    >
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">05 / Forms</p>
-          <Heading as="h2" id="label-title">
-            Label
-          </Heading>
-        </div>
-        <code>LabelPrimitive</code>
-      </div>
-      <Text className="section-description">
-        Native labels associate with a control by htmlFor or by wrapping it.
-        Input Group examples use the same primitive beside their controls.
-      </Text>
-      <div className="examples-grid">
-        <div className="example">
-          <p className="example-label">Primitive · explicit association</p>
-          <div className="example-body space-y-3">
+  return {
+    id: "label",
+    name: "Label",
+    description: "Text identifying a form control.",
+    importCode: 'import { LabelPrimitive } from "@umahra/ui/label";',
+    examples: [
+      {
+        title: "Primitive · explicit association",
+        usage:
+          '<LabelPrimitive htmlFor="name">Display name</LabelPrimitive>\n<InputPrimitive id="name" />',
+        preview: (
+          <div className="project-preview space-y-3">
             <LabelPrimitive htmlFor="label-name">Display name</LabelPrimitive>
             <InputPrimitive
               id="label-name"
               placeholder="Click the label to focus"
             />
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">Consumer wrapper · wrapping label</p>
-          <div className="example-body space-y-3">
+        ),
+      },
+      {
+        title: "Consumer wrapper · wrapping label",
+        usage:
+          '<LabelPrimitive className="gap-2 text-sm">\n  <input type="checkbox" checked={checked} onChange={onChange} />\n  Send me updates\n</LabelPrimitive>',
+        preview: (
+          <div className="project-preview space-y-3">
             <LabelPrimitive className="gap-2 text-sm font-medium">
               <input
                 type="checkbox"
@@ -60,13 +52,13 @@ export function LabelExamples() {
               Updates {checked ? "enabled" : "disabled"}.
             </Text>
           </div>
-        </div>
-      </div>
-    </section>
-  );
+        ),
+      },
+    ],
+  };
 }
 
-export function TextareaExamples() {
+export function useTextareaExamples(): DesignSystemComponent {
   const initialValue = "A shared textarea primitive.";
   const [value, setValue] = useState(initialValue);
   const [disabled, setDisabled] = useState(false);
@@ -75,29 +67,18 @@ export function TextareaExamples() {
   const [result, setResult] = useState("No submission yet.");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  return (
-    <section
-      id="textarea"
-      aria-labelledby="textarea-title"
-      className="component-section"
-    >
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">06 / Forms</p>
-          <Heading as="h2" id="textarea-title">
-            Textarea
-          </Heading>
-        </div>
-        <code>TextareaPrimitive</code>
-      </div>
-      <Text className="section-description">
-        Native textarea props, refs, and content sizing. Standalone focus stays
-        visible; Input Group owns the focus indicator for its textarea.
-      </Text>
-      <div className="examples-grid">
-        <div className="example">
-          <p className="example-label">Primitive · native focus and resizing</p>
-          <div className="example-body space-y-3">
+  return {
+    id: "textarea",
+    name: "Textarea",
+    description: "A text field for longer, multi-line content.",
+    importCode: 'import { TextareaPrimitive } from "@umahra/ui/textarea";',
+    examples: [
+      {
+        title: "Primitive · native focus and resizing",
+        usage:
+          '<LabelPrimitive htmlFor="notes">Plain notes</LabelPrimitive>\n<TextareaPrimitive id="notes" rows={3} defaultValue="Notes" />',
+        preview: (
+          <div className="project-preview space-y-3">
             <LabelPrimitive htmlFor="plain-textarea">
               Plain notes
             </LabelPrimitive>
@@ -107,13 +88,15 @@ export function TextareaExamples() {
               defaultValue="Unstyled textarea"
             />
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">
-            Consumer wrapper · state, form and ref
-          </p>
+        ),
+      },
+      {
+        title: "Consumer wrapper · state, form and ref",
+        usage:
+          '<form onSubmit={onSubmit} onReset={onReset}>\n  <LabelPrimitive htmlFor="notes">Feedback</LabelPrimitive>\n  <TextareaPrimitive id="notes" name="notes" ref={textareaRef}\n    value={value} onChange={onChange} required\n    disabled={disabled} readOnly={readOnly} aria-invalid={invalid} />\n  <Button.Root type="submit">Submit</Button.Root>\n  <Button.Root type="reset">Reset</Button.Root>\n</form>',
+        preview: (
           <form
-            className="example-body space-y-3"
+            className="project-preview space-y-3"
             onSubmit={(event) => {
               event.preventDefault();
               const data = new FormData(event.currentTarget);
@@ -197,8 +180,8 @@ export function TextareaExamples() {
               {result}
             </Text>
           </form>
-        </div>
-      </div>
-    </section>
-  );
+        ),
+      },
+    ],
+  };
 }

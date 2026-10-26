@@ -1,11 +1,9 @@
 import { type ReactNode, useRef, useState } from "react";
-
 import { ButtonPrimitive as Button } from "../src/button";
-import { Heading } from "../src/heading";
 import { InputPrimitive } from "../src/input";
 import { LabelPrimitive } from "../src/label";
 import { SheetPrimitive as Sheet, type SheetContentProps } from "../src/sheet";
-import { Text } from "../src/text";
+import type { DesignSystemComponent } from "../src/visualiser";
 
 const buttonClasses =
   "rounded-md border border-input bg-background px-4 py-2 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring data-disabled:opacity-50";
@@ -28,7 +26,7 @@ function ConsumerSheet({ children, className, ...props }: ConsumerSheetProps) {
   );
 }
 
-export function SheetExamples() {
+export function useSheetExamples(): DesignSystemComponent {
   const [longContent, setLongContent] = useState(false);
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState<true | false | "trap-focus">(false);
@@ -37,31 +35,18 @@ export function SheetExamples() {
   const inputRef = useRef<HTMLInputElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  return (
-    <section
-      id="sheet"
-      aria-labelledby="sheet-title"
-      className="component-section"
-    >
-      <div className="section-heading">
-        <div>
-          <p className="eyebrow">11 / Overlays</p>
-          <Heading as="h2" id="sheet-title">
-            Sheet
-          </Heading>
-        </div>
-        <code>SheetPrimitive</code>
-      </div>
-      <Text className="section-description">
-        Four physical edges, explicit portal and overlay, and consumer-owned
-        panel sizes. Compare focus, scrolling, and optional composition.
-      </Text>
-      <div className="examples-grid">
-        <div className="example">
-          <p className="example-label">
-            Primitive · no overlay or layout companions
-          </p>
-          <div className="example-body">
+  return {
+    id: "sheet",
+    name: "Sheet",
+    description: "A panel that opens from an edge of the screen.",
+    importCode: 'import { SheetPrimitive as Sheet } from "@umahra/ui/sheet";',
+    examples: [
+      {
+        title: "Primitive · no overlay or layout companions",
+        usage:
+          '<Sheet.Root>\n  <Sheet.Trigger>Open sheet</Sheet.Trigger>\n  <Sheet.Portal><Sheet.Content side="right">\n    <Sheet.Title>Details</Sheet.Title><Sheet.Close>Close</Sheet.Close>\n  </Sheet.Content></Sheet.Portal>\n</Sheet.Root>',
+        preview: (
+          <div className="project-preview">
             <Sheet.Root>
               <Sheet.Trigger>Open plain sheet</Sheet.Trigger>
               <Sheet.Portal>
@@ -73,12 +58,14 @@ export function SheetExamples() {
               </Sheet.Portal>
             </Sheet.Root>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">
-            Consumer wrapper · every edge and long content
-          </p>
-          <div className="example-body space-y-4">
+        ),
+      },
+      {
+        title: "Consumer wrapper · every edge and long content",
+        usage:
+          '<Sheet.Root>\n  <Sheet.Trigger>Open sheet</Sheet.Trigger>\n  <ConsumerSheet side="left">\n    <Sheet.Header><Sheet.Title>Project</Sheet.Title><Sheet.Description>Project details</Sheet.Description></Sheet.Header>\n    <div className="min-h-0 overflow-y-auto">Scrollable content</div>\n    <Sheet.Footer><Sheet.Close>Close</Sheet.Close></Sheet.Footer>\n  </ConsumerSheet>\n</Sheet.Root>',
+        preview: (
+          <div className="project-preview space-y-4">
             <div className="flex flex-wrap gap-2">
               {(["top", "right", "bottom", "left"] as const).map((side) => (
                 <Sheet.Root key={side}>
@@ -162,12 +149,14 @@ export function SheetExamples() {
               </Sheet.Trigger>
             </Sheet.Root>
           </div>
-        </div>
-        <div className="example">
-          <p className="example-label">
-            Controlled · modal modes, refs and events
-          </p>
-          <div className="example-body space-y-4">
+        ),
+      },
+      {
+        title: "Controlled · modal modes, refs and events",
+        usage:
+          '<Sheet.Root open={open} onOpenChange={onOpenChange} modal={mode}>\n  <Sheet.Trigger>Open controlled sheet</Sheet.Trigger>\n  <Sheet.Portal><Sheet.Content ref={contentRef} side="right">\n    <Sheet.Title>Details</Sheet.Title><Sheet.Close>Close</Sheet.Close>\n  </Sheet.Content></Sheet.Portal>\n</Sheet.Root>',
+        preview: (
+          <div className="project-preview space-y-4">
             <LabelPrimitive className="flex flex-col gap-2 text-sm">
               Sheet mode
               <select
@@ -245,8 +234,8 @@ export function SheetExamples() {
               {events}
             </p>
           </div>
-        </div>
-      </div>
-    </section>
-  );
+        ),
+      },
+    ],
+  };
 }
